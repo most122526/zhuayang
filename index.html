@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>抓痒头调试助手 · 智能外设</title>
+  <title>抓痒头调试助手 · 实时下发</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -130,6 +130,7 @@
       box-shadow: 0 6px 18px rgba(245,158,75,0.4);
     }
     .send-btn:active { transform: scale(0.96); }
+    .hint-text { font-size: 0.6rem; color: var(--text2); margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -170,7 +171,8 @@
       <span style="color:var(--text2);">180</span>
       <span class="output-value" id="outputDisplay">100</span>
     </div>
-    <button class="send-btn" id="sendCmdBtn"><i class="fas fa-paper-plane"></i> 下发输出量</button>
+    <div class="hint-text">💡 拖动滑块实时下发 (已连接时)</div>
+    <button class="send-btn" id="sendCmdBtn" style="display:none;"><i class="fas fa-paper-plane"></i> 手动下发</button>
   </div>
 
   <div class="stats">
@@ -206,7 +208,6 @@
     const outputSlider = document.getElementById('outputSlider');
     const outputDisplay = document.getElementById('outputDisplay');
     const scratchHead = document.getElementById('scratchHead');
-    const sendCmdBtn = document.getElementById('sendCmdBtn');
     const forceValSpan = document.getElementById('forceVal');
     const feedbackValSpan = document.getElementById('feedbackVal');
     const logBox = document.getElementById('logBox');
@@ -217,6 +218,7 @@
     let notifyChar = null;
     let writeChar = null;
     let isConnected = false;
+    let sendTimer = null;       // 防抖定时器
 
     function updateClock() {
       clockSpan.textContent = new Date().toLocaleTimeString('zh-CN', { hour12: false });
@@ -247,17 +249,44 @@
       const v = Math.min(180, Math.max(20, value));
       outputSlider.value = v;
       outputDisplay.textContent = v;
-      // 映射高度: 20->30px, 180->170px  (范围30~170)
       const h = 30 + (v - 20) * (140 / 160);
       scratchHead.style.height = h + 'px';
     }
+
+    // 防抖下发命令
+    function debouncedSend(value) {
+      if (sendTimer) clearTimeout(sendTimer);
+      sendTimer = setTimeout(() => {
+        const cmd = `${value}#`;
+        sendCommandDirect(cmd);
+      }, 80); // 80ms防抖
+    }
+
+    // 直接发送命令（无防抖）
+    async function sendCommandDirect(cmd) {
+      if (!isConnected || !writeChar) {
+        addLog('未连接，无法发送', 'tx');
+        return;
+      }
+      try {
+        await writeChar.writeValue(new TextEncoder().encode(cmd));
+        addLog(`📤 实时下发: ${cmd}`, 'tx');
+      } catch(e) {
+        addLog(`发送失败: ${e.message}`, 'tx');
+      }
+    }
+
+    // 滑块事件监听
     outputSlider.addEventListener('input', () => {
       const v = parseInt(outputSlider.value);
       outputDisplay.textContent = v;
       const h = 30 + (v - 20) * (140 / 160);
       scratchHead.style.height = h + 'px';
+      // 实时下发（已连接时）
+      if (isConnected) {
+        debouncedSend(v);
+      }
     });
-    updateOutputModel(100);
 
     // 解析上传: #力反馈数据#抓痒头输出反馈量#
     function parseSensorData(raw) {
@@ -282,25 +311,6 @@
       addLog(`原始: ${raw}`, 'rx');
       parseSensorData(raw);
     }
-
-    async function sendCommand(cmd) {
-      if (!isConnected || !writeChar) {
-        addLog('未连接，无法发送', 'tx');
-        return;
-      }
-      try {
-        await writeChar.writeValue(new TextEncoder().encode(cmd));
-        addLog(`📤 下发: ${cmd}`, 'tx');
-      } catch(e) {
-        addLog(`发送失败: ${e.message}`, 'tx');
-      }
-    }
-
-    sendCmdBtn.addEventListener('click', () => {
-      const value = parseInt(outputSlider.value);
-      const cmd = `${value}#`;
-      sendCommand(cmd);
-    });
 
     // 蓝牙操作
     async function scan() {
@@ -372,7 +382,8 @@
     simulateBtn.addEventListener('click', simulateData);
 
     updateConnectionUI(false);
-    addLog('抓痒头调试助手已启动，可先模拟数据');
+    updateOutputModel(100);
+    addLog('抓痒头调试助手已启动，拖动滑块实时下发');
   })();
 </script>
 </body>
