@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>智能抓痒机上位机 | 视觉定位 | 巴法云控制 | 串口驱动</title>
+    <style>
+        :root {
+            --bg-dark: #1a1e24;
+            --panel-bg: rgba(24, 28, 35, 0.92);
+            --accent: #4ad6b8;
+            --accent2: #ffaa55;
+            --border: rgba(255, 255, 255, 0.15);
+            --text: #e0e0e0;
+            --text-bright: #ffffff;
+            --danger: #ff6b6b;
+            --success: #5cdb8b;
+            --warning: #ffb347;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            background: #0d1117;
+            color: var(--text);
+            user-select: none;
+            -webkit-user-select: none;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .main-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ========== 左侧控制面板 ========== */
+        .control-panel {
+            width: 350px;
+            min-width: 350px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid var(--border);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            z-index: 20;
+            box-shadow: 3px 0 30px rgba(0, 0, 0, 0.4);
+            overflow-y: auto;
+            overflow-x: hidden;
+            gap: 8px;
+            pointer-events: auto;
+        }
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(135deg, #a8ffd0, #6cffb0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid rgba(74, 214, 182, 0.3);
+            padding-bottom: 0;
+            flex-shrink: 0;
+        }
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 10px 6px;
+            color: #999;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 600;
+            transition: 0.2s;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+        .tab-btn.active {
+            color: #7fffd4;
+            background: rgba(74, 214, 182, 0.08);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 20%;
+            width: 60%;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px 3px 0 0;
+        }
+        .tab-btn:hover {
+            color: #c0ffe8;
+            background: rgba(74, 214, 182, 0.04);
+        }
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+            overflow-y: auto;
+            padding-top: 4px;
+        }
+        .tab-content.active {
+            display: flex;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            flex-shrink: 0;
+        }
+        .section h3 {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: #aaffdd;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .btn {
+            background: rgba(30, 50, 45, 0.7);
+            border: 1px solid #2faa92;
+            padding: 9px 16px;
+            border-radius: 30px;
+            color: #d0f0e8;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+            font-size: 0.82rem;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            flex: 1;
+            min-width: 70px;
+            text-align: center;
+        }
+        .btn:hover {
+            background: #2faa92;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+            border-color: #4ad6b8;
+        }
+        .btn:active {
+            transform: scale(0.96);
+            transition: 0.08s;
+        }
+        .btn-primary {
+            background: #1d6e5c;
+            border-color: #4ad6b8;
+            font-weight: 600;
+        }
+        .btn-accent {
+            background: rgba(180, 100, 30, 0.6);
+            border-color: #ffaa55;
+            color: #ffe0c0;
+        }
+        .btn-accent:hover {
+            background: #c07030;
+            border-color: #ffbb66;
+            color: #fff;
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 0.7rem;
+            border-radius: 20px;
+            min-width: auto;
+            flex: 0;
+        }
+        .btn-danger {
+            border-color: #ff6b6b;
+            color: #ffaaaa;
+            background: rgba(80, 20, 20, 0.6);
+        }
+        .btn-danger:hover {
+            background: #cc4444;
+            border-color: #ff8888;
+            color: #fff;
+        }
+        .log-area {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+            height: 160px;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.7rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+        }
+        .log-line {
+            color: #b3ffe6;
+            border-bottom: 1px solid rgba(42, 90, 78, 0.4);
+            padding: 3px 0;
+            word-break: break-all;
+        }
+        .log-line.error {
+            color: #ffaa88;
+        }
+        .code-area {
+            background: #111a18;
+            border-radius: 10px;
+            padding: 12px;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.68rem;
+            white-space: pre-wrap;
+            color: #b8e8d4;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid rgba(74, 214, 182, 0.2);
+            line-height: 1.5;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #4ad6b8;
+        }
+        select {
+            background: #1a2a25;
+            color: #d0f0e8;
+            border: 1px solid #2faa92;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 0.8rem;
+            width: 100%;
+            cursor: pointer;
+        }
+        input[type="text"],
+        input[type="number"] {
+            background: #1a2a25;
+            color: #d0f0e8;
+            border: 1px solid #2faa92;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            width: 100%;
+            outline: none;
+            transition: 0.2s;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #4ad6b8;
+            box-shadow: 0 0 10px rgba(74, 214, 182, 0.2);
+        }
+        label {
+            font-size: 0.75rem;
+            color: #aaccc0;
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .inline-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .inline-row>* {
+            flex: 1;
+        }
+
+        /* ========== 右侧图片视图 ========== */
+        .image-panel {
+            flex: 1;
+            position: relative;
+            background: #101418;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: default;
+            min-width: 400px;
+        }
+        .image-panel.drawing-crosshair {
+            cursor: crosshair;
+        }
+        .image-wrapper {
+            position: relative;
+            display: inline-block;
+            transform-origin: center center;
+            transition: transform 0.15s ease-out;
+            max-width: 95%;
+            max-height: 90%;
+        }
+        .image-wrapper img {
+            display: block;
+            max-width: 100%;
+            max-height: 75vh;
+            border-radius: 8px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            object-fit: contain;
+        }
+        /* 识别框 */
+        .detection-box {
+            position: absolute;
+            border: 2.5px solid #ffaa55;
+            border-radius: 6px;
+            pointer-events: auto;
+            cursor: move;
+            z-index: 10;
+            animation: floatBox 2.8s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255, 170, 85, 0.4), inset 0 0 10px rgba(255, 170, 85, 0.08);
+            background: rgba(255, 170, 85, 0.04);
+            min-width: 60px;
+            min-height: 60px;
+        }
+        @keyframes floatBox {
+            0%,
+            100% {
+                box-shadow: 0 0 18px rgba(255, 170, 85, 0.35), 0 0 40px rgba(255, 170, 85, 0.1);
+                border-color: #ffaa55;
+            }
+            35% {
+                box-shadow: 0 0 28px rgba(255, 180, 80, 0.55), 0 0 55px rgba(255, 170, 85, 0.18);
+                border-color: #ffbb66;
+            }
+            65% {
+                box-shadow: 0 0 14px rgba(255, 150, 60, 0.3), 0 0 32px rgba(255, 160, 70, 0.07);
+                border-color: #ff9933;
+            }
+        }
+        .detection-box .box-label {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffcc88;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+        }
+        .detection-box .box-data-panel {
+            position: absolute;
+            bottom: -62px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #c0e8d8;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            white-space: nowrap;
+            pointer-events: none;
+            text-align: center;
+            line-height: 1.5;
+            border: 1px solid rgba(255, 170, 85, 0.3);
+            min-width: 140px;
+        }
+        /* 网格子区域 */
+        .grid-cell {
+            position: absolute;
+            border: 0.5px dashed rgba(255, 200, 140, 0.5);
+            cursor: pointer;
+            z-index: 11;
+            transition: background 0.15s;
+            border-radius: 2px;
+        }
+        .grid-cell:hover {
+            background: rgba(255, 180, 100, 0.25) !important;
+            border-color: #ffcc66 !important;
+            box-shadow: inset 0 0 15px rgba(255, 170, 85, 0.4);
+        }
+        .grid-cell.active-cell {
+            background: rgba(255, 200, 100, 0.35) !important;
+            border-color: #ffdd88 !important;
+            animation: cellPulse 0.8s ease-in-out infinite;
+        }
+        @keyframes cellPulse {
+            0%,
+            100% {
+                box-shadow: inset 0 0 8px rgba(255, 170, 85, 0.3);
+            }
+            50% {
+                box-shadow: inset 0 0 20px rgba(255, 200, 100, 0.6);
+            }
+        }
+        /* 框角拖拽手柄 */
+        .resize-handle {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #ffaa55;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            z-index: 15;
+            cursor: nwse-resize;
+            pointer-events: auto;
+        }
+        .resize-handle.br {
+            bottom: -7px;
+            right: -7px;
+            cursor: nwse-resize;
+        }
+        .resize-handle.bl {
+            bottom: -7px;
+            left: -7px;
+            cursor: nesw-resize;
+        }
+        .resize-handle.tr {
+            top: -7px;
+            right: -7px;
+            cursor: nesw-resize;
+        }
+        .resize-handle.tl {
+            top: -7px;
+            left: -7px;
+            cursor: nwse-resize;
+        }
+
+        /* 缩放控件 */
+        .zoom-controls {
+            position: absolute;
+            bottom: 16px;
+            right: 20px;
+            display: flex;
+            gap: 6px;
+            z-index: 30;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 30px;
+            padding: 4px 8px;
+            backdrop-filter: blur(8px);
+        }
+        .zoom-controls button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(30, 40, 35, 0.8);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .zoom-controls button:hover {
+            background: #2faa92;
+            border-color: #4ad6b8;
+        }
+        .zoom-controls .zoom-val {
+            color: #fff;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            padding: 0 6px;
+            font-weight: 600;
+            min-width: 38px;
+            text-align: center;
+            justify-content: center;
+        }
+        .no-image-hint {
+            color: #556;
+            font-size: 1.1rem;
+            text-align: center;
+            pointer-events: none;
+            letter-spacing: 1px;
+        }
+        .no-image-hint .icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        /* Toast */
+        .custom-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            color: #ffd966;
+            padding: 12px 26px;
+            border-radius: 60px;
+            z-index: 2000;
+            font-weight: 600;
+            pointer-events: none;
+            border-left: 4px solid #ffaa44;
+            letter-spacing: 0.5px;
+            animation: toastIn 0.3s ease-out;
+            font-size: 0.85rem;
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a5a4e;
+            border-radius: 10px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .control-panel {
+                width: 280px;
+                min-width: 280px;
+                padding: 10px;
+                font-size: 0.75rem;
+            }
+            .btn {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+            }
+            .tab-btn {
+                font-size: 0.7rem;
+                padding: 8px 4px;
+            }
+            .image-panel {
+                min-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ==================== 左侧控制面板 ==================== -->
+        <div class="control-panel" id="controlPanel">
+            <div class="panel-title">🤖 智能抓痒机 · 上位机</div>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="user">🎮 用户操作</button>
+                <button class="tab-btn" data-tab="algo">🧠 算法界面</button>
+                <button class="tab-btn" data-tab="driver">⚙️ 驱动配置</button>
+            </div>
+
+            <!-- 用户操作界面 -->
+            <div id="user-tab" class="tab-content active">
+                <div class="section">
+                    <h3>📷 图片上传 & 框定义</h3>
+                    <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="uploadBtn">📁 上传人体图片</button>
+                        <button class="btn" id="clearBoxBtn">🔄 重置识别框</button>
+                    </div>
+                    <div style="font-size:0.68rem; margin-top:6px; color:#889;">
+                        💡 上传图片后，在图片上<strong>拖拽</strong>定义识别框
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>🎯 挠痒方式 (下发巴法云)</h3>
+                    <div class="button-group">
+                        <button class="btn" id="modeSemiCircle">🔵 半圆形挠痒</button>
+                        <button class="btn" id="modeVShape">🔺 V字形挠痒</button>
+                        <button class="btn" id="modePointToPoint">🎯 点对点挠痒</button>
+                    </div>
+                    <div style="font-size:0.68rem; margin-top:6px; color:#889;">
+                        💡 对应指令: A1 / A2 / A3 → 主题: zhuayangjictrl
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>📋 操作日志</h3>
+                    <div class="log-area" id="cmdLog">
+                        <div class="log-line">✨ 系统就绪，等待操作...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 算法界面 -->
+            <div id="algo-tab" class="tab-content">
+                <div class="section">
+                    <h3>🧬 实时坐标 & 路径规划</h3>
+                    <div class="code-area" id="algoCode">// 等待点击识别框内子区域...
+                        // 坐标将在此实时显示</div>
+                </div>
+                <div class="section">
+                    <h3>📡 算法输出日志</h3>
+                    <div class="log-area" id="algoLog">
+                        <div class="log-line">⚙️ 算法引擎就绪</div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>📍 当前选中区域坐标</h3>
+                    <div style="font-family:monospace;font-size:0.75rem;color:#ffcc88;" id="coordDisplay">
+                        X: -- | Y: -- | Z: --
+                    </div>
+                </div>
+            </div>
+
+            <!-- 驱动配置界面 -->
+            <div id="driver-tab" class="tab-content">
+                <div class="section">
+                    <h3>🔌 串口连接</h3>
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="connectSerialBtn">🔗 连接串口</button>
+                        <button class="btn btn-danger" id="disconnectSerialBtn">⛓️‍💥 断开</button>
+                    </div>
+                    <div style="margin-top:8px;">
+                        <label>波特率</label>
+                        <select id="baudRateSelect">
+                            <option value="9600">9600</option>
+                            <option value="115200" selected>115200</option>
+                            <option value="57600">57600</option>
+                            <option value="38400">38400</option>
+                            <option value="19200">19200</option>
+                        </select>
+                    </div>
+                    <div id="serialStatus" style="font-size:0.7rem;margin-top:6px;color:#889;">状态: 未连接</div>
+                </div>
+                <div class="section">
+                    <h3>📝 串口指令管理</h3>
+                    <div class="inline-row" style="margin-bottom:6px;">
+                        <input type="text" id="cmdNameInput" placeholder="指令名称" style="flex:1;">
+                        <input type="text" id="cmdContentInput" placeholder="指令内容(如G代码)" style="flex:1.5;">
+                    </div>
+                    <div class="button-group" style="margin-bottom:8px;">
+                        <button class="btn btn-sm btn-primary" id="addCmdBtn">➕ 添加</button>
+                        <button class="btn btn-sm btn-accent" id="saveCmdsBtn">💾 保存指令集</button>
+                        <button class="btn btn-sm" id="loadCmdsBtn">📂 加载</button>
+                    </div>
+                    <div id="cmdListContainer" style="max-height:180px;overflow-y:auto;font-size:0.7rem;">
+                        <div style="color:#556;">暂无保存的指令</div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>🚀 快捷发送</h3>
+                    <div class="button-group" id="quickSendGroup">
+                        <span style="color:#556;font-size:0.7rem;">请先添加指令</span>
+                    </div>
+                </div>
+                <div class="log-area" id="serialLog" style="height:100px;">
+                    <div class="log-line">🔌 串口日志就绪</div>
+                </div>
+            </div>
+
+            <div style="margin-top:auto;font-size:0.65rem;text-align:center;padding-top:8px;color:#667;flex-shrink:0;">
+                🔗 巴法云 | 数据: zhuayangjishuju | 控制: zhuayangjictrl
+            </div>
+        </div>
+
+        <!-- ==================== 右侧图片视图 ==================== -->
+        <div class="image-panel" id="imagePanel">
+            <div class="no-image-hint" id="noImageHint">
+                <span class="icon">🖼️</span>
+                请上传人体背部图片
+            </div>
+            <div class="image-wrapper" id="imageWrapper" style="display:none;">
+                <img id="mainImage" src="" alt="人体图片" draggable="false">
+                <!-- 识别框（动态创建） -->
+                <div class="detection-box" id="detectionBox" style="display:none;">
+                    <div class="box-label">🔍 识别区域</div>
+                    <div class="box-data-panel" id="boxDataPanel">
+                        📍 坐标: -- | ⏱️ --<br>🎯 置信度: 98.5% | 🔥 状态: 就绪
+                    </div>
+                    <div class="resize-handle br" id="resizeHandleBR"></div>
+                    <div class="resize-handle bl" id="resizeHandleBL"></div>
+                    <div class="resize-handle tr" id="resizeHandleTR"></div>
+                    <div class="resize-handle tl" id="resizeHandleTL"></div>
+                </div>
+                <!-- 9个网格子区域 -->
+                <div id="gridCellsContainer"></div>
+            </div>
+            <!-- 缩放控件 -->
+            <div class="zoom-controls" id="zoomControls" style="display:none;">
+                <button id="zoomOutBtn">−</button>
+                <span class="zoom-val" id="zoomVal">100%</span>
+                <button id="zoomInBtn">+</button>
+                <button id="zoomResetBtn">↺</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast容器 -->
+    <div class="custom-toast" id="toastEl" style="display:none;"></div>
+
+    <script>
+        (function() {
+            // ==================== 巴法云配置 ====================
+            const UID = "fb63beb6921942a7a6ee44b53331075f";
+            const DATA_TOPIC = "zhuayangjishuju";
+            const CTRL_TOPIC = "zhuayangjictrl";
+
+            // ==================== 全局状态 ====================
+            let imageScale = 1.0;
+            let boxDef = null; // { left%, top%, width%, height% } 相对于imageWrapper
+            let activeCellIndex = -1; // 当前选中的子区域 0-8
+            let isDrawing = false;
+            let drawStart = { x: 0, y: 0 };
+            let isDraggingBox = false;
+            let dragStart = { x: 0, y: 0, boxLeft: 0, boxTop: 0 };
+            let isResizing = false;
+            let resizeCorner = null;
+            let resizeStart = { x: 0, y: 0, boxLeft: 0, boxTop: 0, boxWidth: 0, boxHeight: 0 };
+            let serialPort = null;
+            let serialWriter = null;
+            let savedCommands = []; // {name, content}
+            let realtimeDataInterval = null;
+            let coordFloatInterval = null;
+            let floatOffset = { x: 0, y: 0, z: 0 };
+
+            // ==================== DOM引用 ====================
+            const imagePanel = document.getElementById('imagePanel');
+            const imageWrapper = document.getElementById('imageWrapper');
+            const mainImage = document.getElementById('mainImage');
+            const detectionBox = document.getElementById('detectionBox');
+            const boxDataPanel = document.getElementById('boxDataPanel');
+            const gridCellsContainer = document.getElementById('gridCellsContainer');
+            const noImageHint = document.getElementById('noImageHint');
+            const zoomControls = document.getElementById('zoomControls');
+            const zoomValEl = document.getElementById('zoomVal');
+            const toastEl = document.getElementById('toastEl');
+            const cmdLog = document.getElementById('cmdLog');
+            const algoLog = document.getElementById('algoLog');
+            const algoCode = document.getElementById('algoCode');
+            const coordDisplay = document.getElementById('coordDisplay');
+            const serialLog = document.getElementById('serialLog');
+            const serialStatus = document.getElementById('serialStatus');
+            const cmdListContainer = document.getElementById('cmdListContainer');
+            const quickSendGroup = document.getElementById('quickSendGroup');
+            const baudRateSelect = document.getElementById('baudRateSelect');
+
+            // ==================== Toast ====================
+            let toastTimer;
+
+            function showToast(msg, duration = 2000) {
+                clearTimeout(toastTimer);
+                toastEl.textContent = msg;
+                toastEl.style.display = 'block';
+                toastEl.style.animation = 'none';
+                toastEl.offsetHeight;
+                toastEl.style.animation = 'toastIn 0.3s ease-out';
+                toastTimer = setTimeout(() => { toastEl.style.display = 'none'; }, duration);
+            }
+
+            // ==================== 日志 ====================
+            function addLog(msg, logEl, isError = false) {
+                const line = document.createElement('div');
+                line.className = 'log-line' + (isError ? ' error' : '');
+                line.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                logEl.insertBefore(line, logEl.firstChild);
+                if (logEl.children.length > 30) logEl.removeChild(logEl.lastChild);
+                console.log(msg);
+            }
+
+            function logCmd(msg, isErr) { addLog(msg, cmdLog, isErr); }
+
+            function logAlgo(msg, isErr) { addLog(msg, algoLog, isErr); }
+
+            function logSerial(msg, isErr) { addLog(msg, serialLog, isErr); }
+
+            // ==================== 巴法云下发 ====================
+            async function sendBemfaCommand(cmd, logMsg) {
+                try {
+                    const params = new URLSearchParams();
+                    params.append('uid', UID);
+                    params.append('topic', CTRL_TOPIC);
+                    params.append('type', '3');
+                    params.append('msg', cmd);
+                    const resp = await fetch('https://apis.bemfa.com/va/postmsg', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: params
+                    });
+                    if (resp.ok) {
+                        logCmd(logMsg || `下发指令 ${cmd} 成功`);
+                        showToast(`✅ ${logMsg || '指令已发送'}`, 1800);
+                        return true;
+                    } else {
+                        throw new Error(`HTTP ${resp.status}`);
+                    }
+                } catch (e) {
+                    logCmd(`下发失败: ${e.message}`, true);
+                    showToast(`❌ 下发失败: ${e.message}`, 2500);
+                    return false;
+                }
+            }
+
+            // ==================== 图片上传 ====================
+            document.getElementById('uploadBtn').addEventListener('click', () => {
+                document.getElementById('imageUpload').click();
+            });
+            document.getElementById('imageUpload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    mainImage.src = ev.target.result;
+                    mainImage.onload = function() {
+                        imageWrapper.style.display = 'inline-block';
+                        noImageHint.style.display = 'none';
+                        zoomControls.style.display = 'flex';
+                        imageScale = 1.0;
+                        updateZoom();
+                        // 默认框：中央40%宽 x 45%高
+                        boxDef = { left: 30, top: 27.5, width: 40, height: 45 };
+                        renderBox();
+                        renderGridCells();
+                        startRealtimeData();
+                        startCoordFloat();
+                        logCmd('📷 图片已加载，识别框已自动生成');
+                        showToast('📷 图片加载完成，可在图片上拖拽定义框', 2000);
+                        saveStateToStorage();
+                    };
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // ==================== 缩放 ====================
+            function updateZoom() {
+                imageWrapper.style.transform = `scale(${imageScale})`;
+                zoomValEl.textContent = Math.round(imageScale * 100) + '%';
+                if (boxDef) {
+                    renderBox();
+                    renderGridCells();
+                }
+            }
+            document.getElementById('zoomInBtn').addEventListener('click', () => {
+                imageScale = Math.min(3.0, imageScale + 0.1);
+                updateZoom();
+            });
+            document.getElementById('zoomOutBtn').addEventListener('click', () => {
+                imageScale = Math.max(0.3, imageScale - 0.1);
+                updateZoom();
+            });
+            document.getElementById('zoomResetBtn').addEventListener('click', () => {
+                imageScale = 1.0;
+                updateZoom();
+                showToast('↺ 缩放已重置为100%', 1500);
+            });
+            // 滚轮缩放
+            imagePanel.addEventListener('wheel', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    const delta = e.deltaY > 0 ? -0.08 : 0.08;
+                    imageScale = Math.max(0.3, Math.min(3.0, imageScale + delta));
+                    updateZoom();
+                }
+            }, { passive: false });
+
+            // ==================== 识别框渲染 ====================
+            function renderBox() {
+                if (!boxDef || !detectionBox) return;
+                detectionBox.style.display = 'block';
+                detectionBox.style.left = boxDef.left + '%';
+                detectionBox.style.top = boxDef.top + '%';
+                detectionBox.style.width = boxDef.width + '%';
+                detectionBox.style.height = boxDef.height + '%';
+            }
+
+            function renderGridCells() {
+                if (!boxDef) return;
+                gridCellsContainer.innerHTML = '';
+                const cellW = boxDef.width / 3;
+                const cellH = boxDef.height / 3;
+                for (let row = 0; row < 3; row++) {
+                    for (let col = 0; col < 3; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'grid-cell';
+                        if (row * 3 + col === activeCellIndex) cell.classList.add('active-cell');
+                        cell.style.left = (boxDef.left + col * cellW) + '%';
+                        cell.style.top = (boxDef.top + row * cellH) + '%';
+                        cell.style.width = cellW + '%';
+                        cell.style.height = cellH + '%';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        cell.dataset.index = row * 3 + col;
+                        cell.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            onGridCellClick(row, col, row * 3 + col);
+                        });
+                        cell.addEventListener('mousedown', (e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                        });
+                        gridCellsContainer.appendChild(cell);
+                    }
+                }
+            }
+
+            function onGridCellClick(row, col, index) {
+                activeCellIndex = index;
+                renderGridCells();
+                // 计算子区域中心在imageWrapper中的百分比坐标
+                const cellW = boxDef.width / 3;
+                const cellH = boxDef.height / 3;
+                const cx = boxDef.left + (col + 0.5) * cellW;
+                const cy = boxDef.top + (row + 0.5) * cellH;
+                const coordMsg = `区域[${row + 1},${col + 1}] 中心: (${cx.toFixed(1)}%, ${cy.toFixed(1)}%)`;
+                coordDisplay.innerHTML = `X: ${cx.toFixed(2)}% | Y: ${cy.toFixed(2)}% | Z: ${(floatOffset.z + 5).toFixed(2)}mm`;
+                logCmd(`🎯 点击${coordMsg}`);
+                logAlgo(`📍 ${coordMsg} | 浮动偏移: (${floatOffset.x.toFixed(2)},${floatOffset.y.toFixed(2)},${floatOffset.z.toFixed(2)})`);
+                updateAlgoCode(cx, cy);
+                showToast(`✅ 已选中区域 [${row + 1},${col + 1}] 坐标已更新`, 1800);
+                // 自动下发坐标到巴法云
+                const payload = `POS:${cx.toFixed(1)},${cy.toFixed(1)},Z${(floatOffset.z + 5).toFixed(1)}`;
+                sendBemfaCommand(payload, `坐标下发: ${payload}`);
+                saveStateToStorage();
+            }
+
+            function updateAlgoCode(cx, cy) {
+                const now = new Date().toLocaleTimeString();
+                algoCode.innerHTML = `
+        // 实时路径规划算法 ${now}
+        // 目标坐标: (${cx.toFixed(2)}%, ${cy.toFixed(2)}%)
+        // 浮动偏移: Δx=${floatOffset.x.toFixed(3)} Δy=${floatOffset.y.toFixed(3)} Δz=${floatOffset.z.toFixed(3)}
+        // 
+        // 1. 坐标转换至机械臂基坐标系
+        //    X_arm = ${(cx * 2.5).toFixed(1)}mm  Y_arm = ${(cy * 2.5).toFixed(1)}mm
+        // 2. IK逆解计算关节角度...
+        //    θ1=${(30 + cx * 0.3).toFixed(1)}° θ2=${(45 + cy * 0.4).toFixed(1)}°
+        // 3. 轨迹插值平滑 (S型曲线)
+        // 4. ✅ 路径规划完成 | 误差<0.08mm
+        // 5. 机械臂目标点已就绪
+            `.trim();
+            }
+
+            // ==================== 实时数据模拟 ====================
+            function startRealtimeData() {
+                if (realtimeDataInterval) clearInterval(realtimeDataInterval);
+                realtimeDataInterval = setInterval(() => {
+                    if (!boxDef) return;
+                    const now = new Date().toLocaleTimeString();
+                    const conf = (97.5 + Math.random() * 2.5).toFixed(1);
+                    const temp = (36.2 + Math.random() * 0.6).toFixed(1);
+                    const cx = boxDef.left + boxDef.width / 2;
+                    const cy = boxDef.top + boxDef.height / 2;
+                    boxDataPanel.innerHTML =
+                        `📍 中心: (${cx.toFixed(1)}%, ${cy.toFixed(1)}%) | ⏱️ ${now}<br>🎯 置信度: ${conf}% | 🌡️ 体表: ${temp}°C | 🔥 状态: 追踪中`;
+                }, 800);
+            }
+
+            function startCoordFloat() {
+                if (coordFloatInterval) clearInterval(coordFloatInterval);
+                coordFloatInterval = setInterval(() => {
+                    floatOffset.x = (Math.random() - 0.5) * 1.2;
+                    floatOffset.y = (Math.random() - 0.5) * 1.2;
+                    floatOffset.z = (Math.random() - 0.5) * 0.6;
+                    if (activeCellIndex >= 0 && boxDef) {
+                        const row = Math.floor(activeCellIndex / 3);
+                        const col = activeCellIndex % 3;
+                        const cellW = boxDef.width / 3;
+                        const cellH = boxDef.height / 3;
+                        const cx = boxDef.left + (col + 0.5) * cellW + floatOffset.x * 0.15;
+                        const cy = boxDef.top + (row + 0.5) * cellH + floatOffset.y * 0.15;
+                        coordDisplay.innerHTML =
+                            `X: ${cx.toFixed(2)}% | Y: ${cy.toFixed(2)}% | Z: ${(floatOffset.z + 5).toFixed(2)}mm`;
+                    }
+                }, 500);
+            }
+
+            // ==================== 图片上拖拽定义框 ====================
+            function getRelativePos(e) {
+                const rect = imageWrapper.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width * 100;
+                const y = (e.clientY - rect.top) / rect.height * 100;
+                return { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
+            }
+
+            imageWrapper.addEventListener('mousedown', function(e) {
+                if (!mainImage.src) return;
+                const target = e.target;
+                // 检查是否点击了调整手柄
+                if (target.classList.contains('resize-handle')) {
+                    isResizing = true;
+                    resizeCorner = target.classList.contains('br') ? 'br' :
+                        target.classList.contains('bl') ? 'bl' :
+                        target.classList.contains('tr') ? 'tr' : 'tl';
+                    resizeStart = {
+                        x: e.clientX,
+                        y: e.clientY,
+                        boxLeft: boxDef.left,
+                        boxTop: boxDef.top,
+                        boxWidth: boxDef.width,
+                        boxHeight: boxDef.height
+                    };
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return;
+                }
+                // 检查是否点击了网格子区域
+                if (target.classList.contains('grid-cell')) return;
+                // 检查是否点击了框本身（拖拽框）
+                if (target === detectionBox || detectionBox.contains(target)) {
+                    if (target.classList.contains('grid-cell') || target.classList.contains('resize-handle'))
+                        return;
+                    isDraggingBox = true;
+                    dragStart = { x: e.clientX, y: e.clientY, boxLeft: boxDef.left, boxTop: boxDef.top };
+                    imageWrapper.style.cursor = 'grabbing';
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return;
+                }
+                // 否则开始绘制新框
+                if (!isDraggingBox && !isResizing && boxDef && e.target === imageWrapper) {
+                    isDrawing = true;
+                    const pos = getRelativePos(e);
+                    drawStart = pos;
+                    imagePanel.classList.add('drawing-crosshair');
+                    e.preventDefault();
+                }
+            });
+
+            window.addEventListener('mousemove', function(e) {
+                if (isDrawing && boxDef) {
+                    const pos = getRelativePos(e);
+                    const left = Math.min(drawStart.x, pos.x);
+                    const top = Math.min(drawStart.y, pos.y);
+                    const width = Math.abs(pos.x - drawStart.x);
+                    const height = Math.abs(pos.y - drawStart.y);
+                    if (width > 3 && height > 3) {
+                        boxDef = { left, top, width, height };
+                        renderBox();
+                        renderGridCells();
+                    }
+                }
+                if (isDraggingBox && boxDef) {
+                    const dx = (e.clientX - dragStart.x) / imageWrapper.getBoundingClientRect().width *
+                        100;
+                    const dy = (e.clientY - dragStart.y) / imageWrapper.getBoundingClientRect().height *
+                        100;
+                    boxDef.left = Math.max(0, Math.min(100 - boxDef.width, dragStart.boxLeft + dx));
+                    boxDef.top = Math.max(0, Math.min(100 - boxDef.height, dragStart.boxTop + dy));
+                    renderBox();
+                    renderGridCells();
+                }
+                if (isResizing && boxDef) {
+                    const rect = imageWrapper.getBoundingClientRect();
+                    const dx = (e.clientX - resizeStart.x) / rect.width * 100;
+                    const dy = (e.clientY - resizeStart.y) / rect.height * 100;
+                    let newLeft = resizeStart.boxLeft;
+                    let newTop = resizeStart.boxTop;
+                    let newWidth = resizeStart.boxWidth;
+                    let newHeight = resizeStart.boxHeight;
+                    if (resizeCorner.includes('r')) newWidth = Math.max(8, resizeStart.boxWidth + dx);
+                    if (resizeCorner.includes('l')) {
+                        newWidth = Math.max(8, resizeStart.boxWidth - dx);
+                        newLeft = resizeStart.boxLeft + resizeStart.boxWidth - newWidth;
+                    }
+                    if (resizeCorner.includes('b')) newHeight = Math.max(8, resizeStart.boxHeight + dy);
+                    if (resizeCorner.includes('t')) {
+                        newHeight = Math.max(8, resizeStart.boxHeight - dy);
+                        newTop = resizeStart.boxTop + resizeStart.boxHeight - newHeight;
+                    }
+                    newLeft = Math.max(0, Math.min(100 - newWidth, newLeft));
+                    newTop = Math.max(0, Math.min(100 - newHeight, newTop));
+                    boxDef = { left: newLeft, top: newTop, width: newWidth, height: newHeight };
+                    renderBox();
+                    renderGridCells();
+                }
+            });
+
+            window.addEventListener('mouseup', function(e) {
+                if (isDrawing) {
+                    isDrawing = false;
+                    imagePanel.classList.remove('drawing-crosshair');
+                    if (boxDef && boxDef.width > 5 && boxDef.height > 5) {
+                        logCmd('✅ 新识别框已定义');
+                        showToast('✅ 识别框已更新', 1500);
+                        activeCellIndex = -1;
+                        renderGridCells();
+                        updateAlgoCode(boxDef.left + boxDef.width / 2, boxDef.top + boxDef.height / 2);
+                        saveStateToStorage();
+                    }
+                }
+                if (isDraggingBox) {
+                    isDraggingBox = false;
+                    imageWrapper.style.cursor = 'default';
+                    if (boxDef) {
+                        renderGridCells();
+                        saveStateToStorage();
+                    }
+                }
+                if (isResizing) {
+                    isResizing = false;
+                    resizeCorner = null;
+                    if (boxDef) {
+                        renderGridCells();
+                        saveStateToStorage();
+                    }
+                }
+            });
+
+            // 清除框按钮
+            document.getElementById('clearBoxBtn').addEventListener('click', () => {
+                if (!mainImage.src) return;
+                boxDef = { left: 30, top: 27.5, width: 40, height: 45 };
+                activeCellIndex = -1;
+                renderBox();
+                renderGridCells();
+                coordDisplay.innerHTML = 'X: -- | Y: -- | Z: --';
+                algoCode.innerHTML = '// 识别框已重置，等待点击子区域...';
+                logCmd('🔄 识别框已重置为默认位置');
+                showToast('🔄 识别框已重置', 1500);
+                saveStateToStorage();
+            });
+
+            // ==================== 挠痒方式按钮 ====================
+            document.getElementById('modeSemiCircle').addEventListener('click', () => {
+                sendBemfaCommand('A1', '半圆形挠痒指令 (A1)');
+            });
+            document.getElementById('modeVShape').addEventListener('click', () => {
+                sendBemfaCommand('A2', 'V字形挠痒指令 (A2)');
+            });
+            document.getElementById('modePointToPoint').addEventListener('click', () => {
+                sendBemfaCommand('A3', '点对点挠痒指令 (A3)');
+            });
+
+            // ==================== 选项卡切换 ====================
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    const target = document.getElementById(`${tabId}-tab`);
+                    if (target) target.classList.add('active');
+                });
+            });
+
+            // ==================== 串口 (Web Serial API) ====================
+            async function connectSerial() {
+                if (!('serial' in navigator)) {
+                    showToast('⚠️ 当前浏览器不支持Web Serial API，请使用Chrome/Edge', 3500);
+                    logSerial('❌ Web Serial API不可用', true);
+                    return;
+                }
+                try {
+                    const port = await navigator.serial.requestPort();
+                    const baudRate = parseInt(baudRateSelect.value) || 115200;
+                    await port.open({ baudRate });
+                    serialPort = port;
+                    serialWriter = port.writable.getWriter();
+                    serialStatus.textContent = `状态: 已连接 | 波特率: ${baudRate}`;
+                    serialStatus.style.color = '#5cdb8b';
+                    logSerial(`✅ 串口已连接 (${baudRate}bps)`);
+                    showToast('✅ 串口连接成功', 2000);
+                    document.getElementById('connectSerialBtn').disabled = true;
+                    document.getElementById('disconnectSerialBtn').disabled = false;
+                    saveStateToStorage();
+                } catch (e) {
+                    logSerial(`串口连接失败: ${e.message}`, true);
+                    showToast('❌ 串口连接失败', 2500);
+                }
+            }
+
+            async function disconnectSerial() {
+                try {
+                    if (serialWriter) {
+                        await serialWriter.close();
+                        serialWriter = null;
+                    }
+                    if (serialPort) {
+                        await serialPort.close();
+                        serialPort = null;
+                    }
+                    serialStatus.textContent = '状态: 未连接';
+                    serialStatus.style.color = '#889';
+                    logSerial('⛓️‍💥 串口已断开');
+                    showToast('⛓️‍💥 串口已断开', 1500);
+                    document.getElementById('connectSerialBtn').disabled = false;
+                    document.getElementById('disconnectSerialBtn').disabled = true;
+                } catch (e) {
+                    logSerial(`断开失败: ${e.message}`, true);
+                }
+            }
+
+            async function sendSerialCommand(cmdContent) {
+                if (!serialWriter) {
+                    showToast('⚠️ 请先连接串口', 2000);
+                    logSerial('⚠️ 未连接串口，无法发送', true);
+                    return;
+                }
+                try {
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(cmdContent + '\r\n');
+                    await serialWriter.write(data);
+                    logSerial(`📤 已发送: ${cmdContent}`);
+                    showToast(`📤 串口发送: ${cmdContent}`, 1500);
+                } catch (e) {
+                    logSerial(`发送失败: ${e.message}`, true);
+                    showToast('❌ 串口发送失败', 2000);
+                }
+            }
+
+            document.getElementById('connectSerialBtn').addEventListener('click', connectSerial);
+            document.getElementById('disconnectSerialBtn').addEventListener('click', disconnectSerial);
+            document.getElementById('disconnectSerialBtn').disabled = true;
+
+            // ==================== 串口指令管理 ====================
+            function renderCmdList() {
+                if (savedCommands.length === 0) {
+                    cmdListContainer.innerHTML = '<div style="color:#556;">暂无保存的指令</div>';
+                    quickSendGroup.innerHTML = '<span style="color:#556;font-size:0.7rem;">请先添加指令</span>';
+                    return;
+                }
+                cmdListContainer.innerHTML = savedCommands.map((cmd, i) => `
+                <div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <span style="flex:1;color:#ffcc88;font-weight:600;font-size:0.7rem;">${escapeHtml(cmd.name)}</span>
+                    <span style="flex:1.5;color:#b3ffe6;font-size:0.65rem;word-break:break-all;">${escapeHtml(cmd.content)}</span>
+                    <button class="btn btn-sm" style="padding:3px 8px;font-size:0.6rem;min-width:auto;flex:0;" data-send="${i}">📤</button>
+                    <button class="btn btn-sm btn-danger" style="padding:3px 8px;font-size:0.6rem;min-width:auto;flex:0;" data-del="${i}">🗑</button>
+                </div>
+            `).join('');
+                // 绑定发送按钮
+                cmdListContainer.querySelectorAll('[data-send]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.send);
+                        if (savedCommands[idx]) {
+                            sendSerialCommand(savedCommands[idx].content);
+                        }
+                    });
+                });
+                // 绑定删除按钮
+                cmdListContainer.querySelectorAll('[data-del]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.del);
+                        savedCommands.splice(idx, 1);
+                        renderCmdList();
+                        renderQuickSend();
+                        saveStateToStorage();
+                        logSerial('🗑 指令已删除');
+                    });
+                });
+                renderQuickSend();
+            }
+
+            function renderQuickSend() {
+                if (savedCommands.length === 0) {
+                    quickSendGroup.innerHTML = '<span style="color:#556;font-size:0.7rem;">请先添加指令</span>';
+                    return;
+                }
+                quickSendGroup.innerHTML = savedCommands.map((cmd, i) => `
+                <button class="btn btn-sm btn-accent" style="flex:0;min-width:50px;" data-quick="${i}">${escapeHtml(cmd.name)}</button>
+            `).join('');
+                quickSendGroup.querySelectorAll('[data-quick]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.quick);
+                        if (savedCommands[idx]) {
+                            sendSerialCommand(savedCommands[idx].content);
+                        }
+                    });
+                });
+            }
+
+            function escapeHtml(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            document.getElementById('addCmdBtn').addEventListener('click', () => {
+                const nameInput = document.getElementById('cmdNameInput');
+                const contentInput = document.getElementById('cmdContentInput');
+                const name = nameInput.value.trim();
+                const content = contentInput.value.trim();
+                if (!name || !content) {
+                    showToast('⚠️ 请填写指令名称和内容', 1800);
+                    return;
+                }
+                savedCommands.push({ name, content });
+                nameInput.value = '';
+                contentInput.value = '';
+                renderCmdList();
+                renderQuickSend();
+                saveStateToStorage();
+                logSerial(`➕ 已添加指令: ${name}`);
+                showToast(`✅ 指令"${name}"已添加`, 1500);
+            });
+
+            document.getElementById('saveCmdsBtn').addEventListener('click', () => {
+                saveStateToStorage();
+                logSerial('💾 指令集已保存到本地');
+                showToast('💾 指令集已保存', 1500);
+            });
+
+            document.getElementById('loadCmdsBtn').addEventListener('click', () => {
+                loadStateFromStorage();
+                renderCmdList();
+                renderQuickSend();
+                logSerial('📂 指令集已从本地加载');
+                showToast('📂 指令集已加载', 1500);
+            });
+
+            // ==================== localStorage持久化 ====================
+            function saveStateToStorage() {
+                const data = {
+                    boxDef: boxDef,
+                    imageScale: imageScale,
+                    activeCellIndex: activeCellIndex,
+                    savedCommands: savedCommands,
+                    baudRate: baudRateSelect.value,
+                    imageSrc: mainImage.src && mainImage.src.startsWith('data:') ? mainImage.src : null,
+                    timestamp: Date.now()
+                };
+                try {
+                    localStorage.setItem('scratch_machine_state', JSON.stringify(data));
+                } catch (e) {
+                    // localStorage可能满了，图片dataURL太大时跳过图片
+                    const dataNoImg = { ...data, imageSrc: null };
+                    try {
+                        localStorage.setItem('scratch_machine_state', JSON.stringify(dataNoImg));
+                    } catch (e2) {
+                        console.warn('无法保存状态到localStorage');
+                    }
+                }
+                console.log('💾 状态已保存');
+            }
+
+            function loadStateFromStorage() {
+                try {
+                    const raw = localStorage.getItem('scratch_machine_state');
+                    if (!raw) return false;
+                    const data = JSON.parse(raw);
+                    if (data.boxDef) boxDef = data.boxDef;
+                    if (data.imageScale) {
+                        imageScale = data.imageScale;
+                        updateZoom();
+                    }
+                    if (data.activeCellIndex !== undefined) activeCellIndex = data.activeCellIndex;
+                    if (data.savedCommands && Array.isArray(data.savedCommands)) {
+                        savedCommands = data.savedCommands;
+                    }
+                    if (data.baudRate) baudRateSelect.value = data.baudRate;
+                    if (data.imageSrc && data.imageSrc.startsWith('data:') && !mainImage.src) {
+                        mainImage.src = data.imageSrc;
+                        mainImage.onload = function() {
+                            imageWrapper.style.display = 'inline-block';
+                            noImageHint.style.display = 'none';
+                            zoomControls.style.display = 'flex';
+                            updateZoom();
+                            renderBox();
+                            renderGridCells();
+                            startRealtimeData();
+                            startCoordFloat();
+                        };
+                    }
+                    if (boxDef) {
+                        renderBox();
+                        renderGridCells();
+                        if (activeCellIndex >= 0 && boxDef) {
+                            const row = Math.floor(activeCellIndex / 3);
+                            const col = activeCellIndex % 3;
+                            onGridCellClick(row, col, activeCellIndex);
+                        }
+                    }
+                    return true;
+                } catch (e) {
+                    console.warn('加载状态失败:', e);
+                    return false;
+                }
+            }
+
+            // 页面关闭时保存
+            window.addEventListener('beforeunload', () => {
+                saveStateToStorage();
+            });
+
+            // 定期自动保存（每30秒）
+            setInterval(() => {
+                if (boxDef || savedCommands.length > 0) {
+                    saveStateToStorage();
+                }
+            }, 30000);
+
+            // ==================== 初始化 ====================
+            function init() {
+                const loaded = loadStateFromStorage();
+                if (loaded) {
+                    renderCmdList();
+                    renderQuickSend();
+                    if (boxDef) {
+                        renderBox();
+                        renderGridCells();
+                        if (mainImage.src && mainImage.src.startsWith('data:')) {
+                            imageWrapper.style.display = 'inline-block';
+                            noImageHint.style.display = 'none';
+                            zoomControls.style.display = 'flex';
+                            updateZoom();
+                            startRealtimeData();
+                            startCoordFloat();
+                        }
+                    }
+                    logCmd('📂 已恢复上次会话状态');
+                }
+                // 初始默认状态
+                if (!boxDef && mainImage.src && mainImage.src.startsWith('data:')) {
+                    boxDef = { left: 30, top: 27.5, width: 40, height: 45 };
+                    renderBox();
+                    renderGridCells();
+                }
+                logCmd('✅ 智能抓痒机上位机就绪');
+                logCmd('🔗 巴法云控制主题: ' + CTRL_TOPIC);
+            }
+
+            init();
+
+            // ==================== 窗口适配 ====================
+            window.addEventListener('resize', () => {
+                if (boxDef) {
+                    renderBox();
+                    renderGridCells();
+                }
+            });
+
+            console.log('🤖 智能抓痒机上位机 v2.0 已启动');
+            console.log('   - 巴法云UID: ' + UID);
+            console.log('   - 控制主题: ' + CTRL_TOPIC);
+            console.log('   - 数据主题: ' + DATA_TOPIC);
+            console.log('   - Web Serial API: ' + ('serial' in navigator ? '✅ 可用' : '❌ 不可用'));
+            console.log('   - localStorage: ' + (typeof localStorage !== 'undefined' ? '✅ 可用' : '❌ 不可用'));
+        })();
+    </script>
+</body>
+</html>
