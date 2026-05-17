@@ -1,390 +1,502 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>抓痒头调试助手 · 实时下发</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    :root {
-      --bg: #1e1e2e;
-      --card: #2a2a3c;
-      --accent: #f59e4b;
-      --accent2: #e8685a;
-      --text: #f0e9e1;
-      --text2: #b0a8a0;
-      --bar-bg: #3a3a4e;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at 60% 20%, #30243a, #1a1a26);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .phone {
-      max-width: 400px;
-      width: 100%;
-      background: var(--bg);
-      border-radius: 44px;
-      padding: 18px 16px 24px;
-      box-shadow: 0 20px 45px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.06);
-      border: 1px solid #4a3e52;
-      color: var(--text);
-    }
-    .status-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #252538;
-      border-radius: 30px;
-      padding: 8px 16px;
-      margin-bottom: 16px;
-      font-weight: 500;
-      font-size: 0.8rem;
-    }
-    .bt-area { display:flex; align-items:center; gap:8px; }
-    .led {
-      width: 10px; height: 10px; background: #5a5a7a; border-radius: 50%;
-      transition: 0.3s;
-    }
-    .led.active {
-      background: #2ecc71; box-shadow: 0 0 12px #2ecc71; animation: pulse 1.2s infinite;
-    }
-    @keyframes pulse { 0%,100%{opacity:0.7;transform:scale(1);} 50%{opacity:1;transform:scale(1.2);} }
-    .clock { font-family: monospace; font-weight: 600; }
-    .btn {
-      background: #3c3c52; border: none; padding: 6px 14px; border-radius: 2rem;
-      font-weight: 600; font-size: 0.7rem; color: #fff; cursor: pointer;
-      display: flex; align-items: center; gap: 5px; border: 1px solid #5a5a76;
-      transition: 0.15s;
-    }
-    .btn:active { transform: scale(0.95); background: #52526a; }
-    .btn-primary { background: #b45f3a; border-color: #d0784c; }
-    .btn-warn { background: #a6442c; border-color: #c05a3e; }
-    .config-panel {
-      display: none; background: #252538; border-radius: 18px; padding: 12px;
-      margin-bottom: 14px; border: 1px solid #4a3e52; flex-direction: column; gap: 8px;
-    }
-    .config-panel input {
-      background: #1a1a26; border: 1px solid #4a3e52; color: #fff; padding: 6px 10px;
-      border-radius: 16px; font-family: monospace; font-size: 0.65rem; flex:1; outline: none;
-    }
-    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>江理工抓养鸡 · 蓝牙挠痒</title>
+    <style>
+        :root {
+            --phone-w: 360px;
+            --phone-h: 700px;
+            --bg: #fdf5ec;
+            --skin: #f2c4a0;
+            --skin-dark: #d99a7a;
+            --accent: #c7784a;
+            --text: #3d2b22;
+            --border: #cf9f7f;
+            --card: #fff8f2;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        body {
+            background: #2c241e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .phone {
+            width: var(--phone-w);
+            height: var(--phone-h);
+            background: #1e1814;
+            border-radius: 42px;
+            padding: 12px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            position: relative;
+        }
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            border-radius: 32px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 0 0 2px #b89a7a;
+        }
+        .status-bar {
+            background: #fae4d0;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #5a3a2a;
+        }
+        .bt-led {
+            width: 10px; height: 10px; background: #c4a88c; border-radius: 50%;
+            transition: 0.3s; margin-right: 6px;
+        }
+        .bt-led.active { background: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
+        .title {
+            background: #e0bba2;
+            padding: 10px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 1px;
+            color: #3d2b22;
+        }
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+        .gauge-wrap {
+            width: 120px; height: 120px; position: relative; margin: 5px auto;
+        }
+        .gauge-wrap canvas { width: 100%; height: 100%; }
+        .gauge-value {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 26px; font-weight: 800; color: #3d2b22;
+        }
+        .contact-box {
+            display: flex; align-items: center; gap: 8px; font-weight: 600;
+            background: #fff; padding: 6px 14px; border-radius: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .contact-dot {
+            width: 12px; height: 12px; border-radius: 50%; background: #c0a080;
+            transition: 0.3s;
+        }
+        .contact-dot.touching { background: #c0392b; box-shadow: 0 0 12px #e74c3c; }
+        .model-area {
+            background: linear-gradient(180deg, #f7d3b0 0%, #e7b68a 100%);
+            border-radius: 100px 100px 50px 50px;
+            width: 220px; height: 240px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+            position: relative;
+            margin: 5px 0;
+        }
+        .grid-back {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            width: 160px;
+            height: 160px;
+            background: rgba(0,0,0,0.04);
+            border-radius: 18px;
+            padding: 6px;
+        }
+        .grid-cell {
+            background: rgba(255,255,255,0.55);
+            border: 2px solid #b8896a;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: #4a2c1a;
+            cursor: pointer;
+            transition: 0.15s;
+            user-select: none;
+        }
+        .grid-cell:active { background: #f5c098; transform: scale(0.93); }
+        .mode-row {
+            display: flex; gap: 10px; margin-top: 4px;
+        }
+        .mode-btn {
+            padding: 8px 18px; border-radius: 24px; border: 2px solid #cf9f7f;
+            background: #fff7ef; font-weight: 600; cursor: pointer; color: #4a2c1a;
+            transition: 0.2s; font-size: 14px;
+        }
+        .mode-btn.active { background: #c7784a; color: white; border-color: #a55a32; }
+        .reset-btn {
+            padding: 8px 28px; background: #8c6e5d; color: white; border: none;
+            border-radius: 20px; font-weight: 600; cursor: pointer; margin: 6px 0;
+            font-size: 14px;
+        }
+        .reset-btn:active { background: #6e5647; }
 
-    .main-display {
-      background: var(--card); border-radius: 28px; padding: 16px; margin-bottom: 16px;
-      border: 1px solid #4a3e52; text-align: center;
-    }
-    .model-container {
-      position: relative; height: 200px; margin: 8px 0 12px; display: flex;
-      align-items: flex-end; justify-content: center; background: #1a1a26;
-      border-radius: 24px; overflow: hidden; border: 1px solid #3a3a4e;
-    }
-    .scratch-head {
-      position: absolute; bottom: 0; width: 60px; background: linear-gradient(180deg, #e8685a, #c04a3a);
-      border-radius: 30px 30px 10px 10px; transition: height 0.1s linear;
-      box-shadow: 0 -4px 12px rgba(232,104,90,0.5); left: 50%; transform: translateX(-50%);
-    }
-    .head-tip {
-      width: 30px; height: 30px; background: #f7d08a; border-radius: 50%;
-      position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-      box-shadow: 0 0 15px #f7d08a;
-    }
-    .slider-row {
-      display: flex; align-items: center; gap: 12px; margin-top: 8px;
-    }
-    input[type=range] {
-      flex:1; height: 6px; -webkit-appearance: none; background: var(--bar-bg);
-      border-radius: 6px; outline: none;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 28px; height: 28px; background: var(--accent);
-      border-radius: 50%; box-shadow: 0 0 10px var(--accent); cursor: pointer;
-    }
-    .output-value {
-      font-weight: 800; font-size: 1.8rem; color: var(--accent); min-width: 60px; text-align: center;
-    }
-    .stats {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;
-    }
-    .stat-card {
-      background: var(--card); border-radius: 18px; padding: 12px; text-align: center;
-      border: 1px solid #4a3e52;
-    }
-    .stat-label { font-size: 0.6rem; color: var(--text2); }
-    .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--accent); margin: 4px 0; }
-    .log-box {
-      background: #12121e; border-radius: 16px; padding: 10px; height: 100px;
-      overflow-y: auto; font-family: monospace; font-size: 0.6rem; color: #b0b0c0;
-      border: 1px solid #2e2e42; margin-top: 10px;
-    }
-    .send-btn {
-      background: var(--accent); border: none; padding: 12px;
-      border-radius: 30px; font-weight: 800; color: #1a1a26; width: 100%;
-      font-size: 0.9rem; cursor: pointer; margin-top: 8px;
-      box-shadow: 0 6px 18px rgba(245,158,75,0.4);
-    }
-    .send-btn:active { transform: scale(0.96); }
-    .hint-text { font-size: 0.6rem; color: var(--text2); margin-top: 4px; }
-  </style>
+        .config-row {
+            background: #f5e4d5; border-radius: 16px; padding: 10px; display: flex;
+            flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px;
+            box-shadow: inset 0 0 0 1px #cfb39b;
+        }
+        .config-row input {
+            padding: 6px 8px; border: 1px solid #cbad91; border-radius: 12px;
+            background: #fffdf9; font-family: monospace; font-size: 11px; flex: 1;
+            min-width: 100px; outline: none;
+        }
+        .btn {
+            padding: 6px 14px; border-radius: 16px; font-weight: 600; font-size: 11px;
+            cursor: pointer; border: 1px solid #c4a084; background: #fff5eb; color: #4a2c1a;
+            white-space: nowrap;
+        }
+        .btn:active { background: #e6ccb5; }
+        .btn-primary { background: #c7784a; color: white; border-color: #a55a32; }
+
+        .toast {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+            background: #333; color: #fff; padding: 10px 26px; border-radius: 30px;
+            font-size: 13px; z-index: 999; pointer-events: none;
+            animation: fadeInOut 2.5s forwards;
+        }
+        @keyframes fadeInOut {
+            0% {opacity:0; transform:translateX(-50%) translateY(10px);}
+            15% {opacity:1; transform:translateX(-50%) translateY(0);}
+            80% {opacity:1;} 100% {opacity:0;}
+        }
+    </style>
 </head>
 <body>
 <div class="phone">
-  <div class="status-bar">
-    <div class="bt-area">
-      <div class="led" id="bleLed"></div>
-      <span id="connStatus">未连接</span>
-      <button class="btn" id="configToggleBtn"><i class="fas fa-cog"></i></button>
-    </div>
-    <div class="clock" id="liveClock">--:--:--</div>
-  </div>
+    <div class="screen">
+        <div class="status-bar">
+            <div style="display:flex;align-items:center;">
+                <span class="bt-led" id="btLed"></span>
+                <span id="btStatus">未连接</span>
+            </div>
+            <span id="clock">--:--</span>
+            <button class="btn" id="btConfigBtn" style="font-size:10px;">蓝牙</button>
+        </div>
+        <div class="title">江理工抓养鸡</div>
+        <div class="content">
+            <!-- 蓝牙配置面板（默认隐藏） -->
+            <div class="config-row" id="btPanel" style="display:none;">
+                <input id="svcUuid" value="0000fff0-0000-1000-8000-00805f9b34fb" placeholder="服务UUID">
+                <input id="notifyUuid" value="0000fff1-0000-1000-8000-00805f9b34fb" placeholder="通知UUID">
+                <button class="btn" id="scanBtn">扫描</button>
+                <button class="btn" id="connectBtn" disabled>连接</button>
+                <button class="btn" id="disconnectBtn" disabled>断开</button>
+            </div>
 
-  <div class="config-panel" id="configPanel">
-    <div class="row">
-      <input id="serviceUuid" value="0000fff0-0000-1000-8000-00805f9b34fb" placeholder="服务UUID">
-      <input id="notifyUuid" value="0000fff1-0000-1000-8000-00805f9b34fb" placeholder="通知UUID">
-      <input id="writeUuid" value="0000fff1-0000-1000-8000-00805f9b34fb" placeholder="写入UUID">
-    </div>
-    <div class="row">
-      <button class="btn" id="scanBtn">扫描</button>
-      <button class="btn" id="connectBtn" disabled>连接</button>
-      <button class="btn btn-warn" id="disconnectBtn" disabled>断开</button>
-      <button class="btn" id="simulateBtn"><i class="fas fa-sync-alt"></i> 模拟</button>
-    </div>
-  </div>
+            <!-- 力反馈仪表 -->
+            <div class="gauge-wrap" id="gaugeWrap">
+                <canvas id="gaugeCanvas" width="120" height="120"></canvas>
+                <div class="gauge-value" id="forceValue">--</div>
+            </div>
+            <div style="font-size:12px; color:#7a5a42;">力反馈 (N)</div>
 
-  <div class="main-display">
-    <div style="font-weight:700; margin-bottom:4px;">🔧 抓痒头伸缩模型</div>
-    <div class="model-container" id="modelBox">
-      <div class="scratch-head" id="scratchHead" style="height: 100px;">
-        <div class="head-tip"></div>
-      </div>
-    </div>
-    <div class="slider-row">
-      <span style="color:var(--text2);">20</span>
-      <input type="range" id="outputSlider" min="20" max="180" value="100">
-      <span style="color:var(--text2);">180</span>
-      <span class="output-value" id="outputDisplay">100</span>
-    </div>
-    <div class="hint-text">💡 拖动滑块实时下发 (已连接时)</div>
-    <button class="send-btn" id="sendCmdBtn" style="display:none;"><i class="fas fa-paper-plane"></i> 手动下发</button>
-  </div>
+            <!-- 背部接触状态 -->
+            <div class="contact-box">
+                <span>挠痒肌：</span>
+                <div class="contact-dot" id="contactDot"></div>
+                <span id="contactText">等待检测</span>
+            </div>
 
-  <div class="stats">
-    <div class="stat-card">
-      <div class="stat-label">📊 力反馈</div>
-      <div class="stat-value" id="forceVal">0.0</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">⚙️ 反馈输出量</div>
-      <div class="stat-value" id="feedbackVal">0</div>
-    </div>
-  </div>
+            <!-- 人体模型 + 九宫格 -->
+            <div class="model-area">
+                <div class="grid-back" id="gridContainer"></div>
+            </div>
 
-  <div class="log-box" id="logBox">
-    <div>🔧 抓痒头调试助手就绪</div>
-  </div>
+            <!-- 模式选择 -->
+            <div class="mode-row">
+                <button class="mode-btn active" id="btnPoint" onclick="setMode('point')">👆 点触式</button>
+                <button class="mode-btn" id="btnRound" onclick="setMode('round')">🌀 半圆式</button>
+            </div>
+            <button class="reset-btn" onclick="sendReset()">↺ 复位</button>
+        </div>
+    </div>
 </div>
+<div id="toastBox"></div>
 
 <script>
-  (function() {
-    // DOM
-    const bleLed = document.getElementById('bleLed');
-    const connStatus = document.getElementById('connStatus');
-    const configToggleBtn = document.getElementById('configToggleBtn');
-    const configPanel = document.getElementById('configPanel');
-    const scanBtn = document.getElementById('scanBtn');
-    const connectBtn = document.getElementById('connectBtn');
-    const disconnectBtn = document.getElementById('disconnectBtn');
-    const simulateBtn = document.getElementById('simulateBtn');
-    const serviceUuidInput = document.getElementById('serviceUuid');
-    const notifyUuidInput = document.getElementById('notifyUuid');
-    const writeUuidInput = document.getElementById('writeUuid');
-    const outputSlider = document.getElementById('outputSlider');
-    const outputDisplay = document.getElementById('outputDisplay');
-    const scratchHead = document.getElementById('scratchHead');
-    const forceValSpan = document.getElementById('forceVal');
-    const feedbackValSpan = document.getElementById('feedbackVal');
-    const logBox = document.getElementById('logBox');
-    const clockSpan = document.getElementById('liveClock');
+    (function() {
+        // 配置
+        const UID = 'fb63beb6921942a7a6ee44b53331075f';
+        const DATA_TOPIC = 'zhuayanghead';
+        const CTRL_TOPIC = 'zhuayangapp';
 
-    let bluetoothDevice = null;
-    let gattServer = null;
-    let notifyChar = null;
-    let writeChar = null;
-    let isConnected = false;
-    let sendTimer = null;       // 防抖定时器
+        // 状态
+        let currentMode = 'point'; // 'point' 或 'round'
+        let bluetoothDevice = null, gattServer = null, notifyChar = null, writeChar = null;
+        let isBleConnected = false;
+        let lastContact = null; // 上次接触状态 (0接触 1离开)
 
-    function updateClock() {
-      clockSpan.textContent = new Date().toLocaleTimeString('zh-CN', { hour12: false });
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+        // DOM 元素
+        const btLed = document.getElementById('btLed');
+        const btStatus = document.getElementById('btStatus');
+        const btConfigBtn = document.getElementById('btConfigBtn');
+        const btPanel = document.getElementById('btPanel');
+        const scanBtn = document.getElementById('scanBtn');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const svcUuidInput = document.getElementById('svcUuid');
+        const notifyUuidInput = document.getElementById('notifyUuid');
+        const forceValueEl = document.getElementById('forceValue');
+        const contactDot = document.getElementById('contactDot');
+        const contactText = document.getElementById('contactText');
+        const gridContainer = document.getElementById('gridContainer');
+        const btnPoint = document.getElementById('btnPoint');
+        const btnRound = document.getElementById('btnRound');
+        const toastBox = document.getElementById('toastBox');
+        const clockSpan = document.getElementById('clock');
 
-    function addLog(msg, type='info') {
-      const div = document.createElement('div');
-      div.style.color = type==='rx'?'#2ecc71': type==='tx'?'#3498db':'#b0b0c0';
-      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-      logBox.appendChild(div);
-      logBox.scrollTop = logBox.scrollHeight;
-      if(logBox.children.length > 30) logBox.removeChild(logBox.children[0]);
-    }
+        // 时钟
+        function updateClock() { clockSpan.textContent = new Date().toLocaleTimeString('zh-CN', {hour12: false, hour:'2-digit', minute:'2-digit'}); }
+        setInterval(updateClock, 1000); updateClock();
 
-    function updateConnectionUI(connected) {
-      isConnected = connected;
-      bleLed.classList.toggle('active', connected);
-      connStatus.textContent = connected ? '已连接' : '未连接';
-      connectBtn.disabled = connected || !bluetoothDevice;
-      disconnectBtn.disabled = !connected;
-      scanBtn.disabled = connected;
-    }
-
-    // 更新伸出模型与显示
-    function updateOutputModel(value) {
-      const v = Math.min(180, Math.max(20, value));
-      outputSlider.value = v;
-      outputDisplay.textContent = v;
-      const h = 30 + (v - 20) * (140 / 160);
-      scratchHead.style.height = h + 'px';
-    }
-
-    // 防抖下发命令
-    function debouncedSend(value) {
-      if (sendTimer) clearTimeout(sendTimer);
-      sendTimer = setTimeout(() => {
-        const cmd = `${value}#`;
-        sendCommandDirect(cmd);
-      }, 80); // 80ms防抖
-    }
-
-    // 直接发送命令（无防抖）
-    async function sendCommandDirect(cmd) {
-      if (!isConnected || !writeChar) {
-        addLog('未连接，无法发送', 'tx');
-        return;
-      }
-      try {
-        await writeChar.writeValue(new TextEncoder().encode(cmd));
-        addLog(`📤 实时下发: ${cmd}`, 'tx');
-      } catch(e) {
-        addLog(`发送失败: ${e.message}`, 'tx');
-      }
-    }
-
-    // 滑块事件监听
-    outputSlider.addEventListener('input', () => {
-      const v = parseInt(outputSlider.value);
-      outputDisplay.textContent = v;
-      const h = 30 + (v - 20) * (140 / 160);
-      scratchHead.style.height = h + 'px';
-      // 实时下发（已连接时）
-      if (isConnected) {
-        debouncedSend(v);
-      }
-    });
-
-    // 解析上传: #力反馈数据#抓痒头输出反馈量#
-    function parseSensorData(raw) {
-      const match = raw.match(/#([\d.]+)#([\d.]+)#/);
-      if (match) {
-        const force = parseFloat(match[1]);
-        const feedback = parseInt(match[2]);
-        if (!isNaN(force) && !isNaN(feedback)) {
-          forceValSpan.textContent = force.toFixed(1);
-          feedbackValSpan.textContent = feedback;
-          addLog(`📥 力反馈:${force.toFixed(1)} 反馈量:${feedback}`, 'rx');
-          return true;
+        // 绘制力反馈仪表
+        function drawGauge(value) {
+            const canvas = document.getElementById('gaugeCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            const cx = w/2, cy = h/2, r = 48;
+            const maxForce = 100;
+            const ratio = Math.min(1, Math.max(0, value / maxForce));
+            // 背景弧
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0.75 * Math.PI, 2.25 * Math.PI);
+            ctx.strokeStyle = '#e8d3c3'; ctx.lineWidth = 12; ctx.stroke();
+            // 进度弧
+            const start = 0.75 * Math.PI;
+            const end = start + ratio * 1.5 * Math.PI;
+            ctx.beginPath(); ctx.arc(cx, cy, r, start, end);
+            ctx.strokeStyle = ratio > 0.7 ? '#c0392b' : '#c7784a';
+            ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.stroke();
+            forceValueEl.textContent = value.toFixed(1);
         }
-      }
-      return false;
-    }
 
-    function onNotification(event) {
-      const val = event.target.value;
-      if (!val) return;
-      const raw = new TextDecoder('utf-8').decode(val).trim();
-      addLog(`原始: ${raw}`, 'rx');
-      parseSensorData(raw);
-    }
+        // 更新接触状态UI
+        function updateContactUI(contact) { // contact === 0 表示接触
+            if (contact === 0) {
+                contactDot.classList.add('touching');
+                contactText.textContent = '已接触 (挠痒中)';
+            } else {
+                contactDot.classList.remove('touching');
+                contactText.textContent = '暂时松开，离开背部';
+            }
+        }
 
-    // 蓝牙操作
-    async function scan() {
-      if (!navigator.bluetooth) { alert('需要Web Bluetooth'); return; }
-      const svc = serviceUuidInput.value.trim();
-      if (!svc) return alert('输入服务UUID');
-      try {
-        const device = await navigator.bluetooth.requestDevice({
-          filters: [{ services: [svc] }],
-          optionalServices: [svc]
+        // 语音播报
+        function speak(text) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'zh-CN'; utter.rate = 1.1;
+            window.speechSynthesis.speak(utter);
+        }
+
+        // Toast
+        function showToast(msg) {
+            const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg;
+            toastBox.appendChild(el);
+            setTimeout(() => el.remove(), 2500);
+        }
+
+        // 构建九宫格
+        function buildGrid() {
+            gridContainer.innerHTML = '';
+            for (let i = 1; i <= 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                cell.textContent = i;
+                cell.addEventListener('click', () => onGridClick(i));
+                gridContainer.appendChild(cell);
+            }
+        }
+
+        // 九宫格点击 -> 发送指令
+        function onGridClick(index) {
+            let cmdIndex;
+            if (currentMode === 'point') {
+                cmdIndex = 2 * index - 1; // 1->1, 2->3, 3->5 ...
+            } else {
+                cmdIndex = 2 * index;      // 1->2, 2->4, 3->6 ...
+            }
+            const cmd = 'a' + cmdIndex; // a1 ~ a18
+            sendControlCmd(cmd);
+            const modeText = currentMode === 'point' ? '点触' : '半圆';
+            showToast(`发送 ${cmd} (${modeText}模式 区域${index})`);
+        }
+
+        // 模式切换
+        window.setMode = function(mode) {
+            currentMode = mode;
+            btnPoint.classList.toggle('active', mode === 'point');
+            btnRound.classList.toggle('active', mode === 'round');
+        };
+
+        // 复位
+        window.sendReset = function() {
+            sendControlCmd('a19');
+            showToast('复位指令已发送 (a19)');
+        };
+
+        // 发送控制指令 (到控制主题)
+        async function sendControlCmd(cmd) {
+            try {
+                const params = new URLSearchParams();
+                params.append('uid', UID);
+                params.append('topic', CTRL_TOPIC);
+                params.append('type', '3');
+                params.append('msg', cmd);
+                await fetch('https://apis.bemfa.com/va/postmsg', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                });
+            } catch (e) {
+                console.error('指令发送失败', e);
+            }
+        }
+
+        // 上传数据到云端 (蓝牙接收后)
+        async function uploadToCloud(force, contact) {
+            const msg = `#${force.toFixed(1)}#${contact}#`;
+            try {
+                const params = new URLSearchParams();
+                params.append('uid', UID);
+                params.append('topic', DATA_TOPIC);
+                params.append('type', '3');
+                params.append('msg', msg);
+                await fetch('https://apis.bemfa.com/va/postmsg', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                });
+            } catch (e) {
+                console.error('云端上传失败', e);
+            }
+        }
+
+        // 处理接收到的蓝牙数据
+        function handleBluetoothData(raw) {
+            const cleaned = raw.trim();
+            const match = cleaned.match(/#([\d.]+)#(\d)#/);
+            if (!match) return;
+            const force = parseFloat(match[1]);
+            const contact = parseInt(match[2]); // 0接触 1离开
+            if (isNaN(force) || (contact !== 0 && contact !== 1)) return;
+
+            // 更新仪表
+            drawGauge(force);
+            updateContactUI(contact);
+            // 接触边沿检测 (1->0)
+            if (lastContact === 1 && contact === 0) {
+                speak('背部已接触');
+                showToast('🤚 检测到背部接触');
+            }
+            lastContact = contact;
+            // 上传到云端
+            uploadToCloud(force, contact);
+        }
+
+        // 蓝牙通知回调
+        function onNotification(event) {
+            const val = event.target.value;
+            if (!val) return;
+            const text = new TextDecoder('utf-8').decode(val);
+            handleBluetoothData(text);
+        }
+
+        // 更新蓝牙UI
+        function updateBleUI(connected) {
+            isBleConnected = connected;
+            btLed.classList.toggle('active', connected);
+            btStatus.textContent = connected ? '已连接' : '未连接';
+            connectBtn.disabled = connected || !bluetoothDevice;
+            disconnectBtn.disabled = !connected;
+            scanBtn.disabled = connected;
+        }
+
+        // 蓝牙操作
+        async function scan() {
+            if (!navigator.bluetooth) { alert('需要Web Bluetooth'); return; }
+            const svcUuid = svcUuidInput.value.trim();
+            if (!svcUuid) return alert('请输入服务UUID');
+            try {
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: [svcUuid] }],
+                    optionalServices: [svcUuid]
+                });
+                bluetoothDevice = device;
+                connectBtn.disabled = false;
+                showToast('已选择设备');
+            } catch (e) {
+                if (!e.message.includes('cancelled')) showToast('扫描失败');
+            }
+        }
+
+        async function connect() {
+            if (!bluetoothDevice) return;
+            const svcUuid = svcUuidInput.value.trim();
+            const ntfUuid = notifyUuidInput.value.trim();
+            try {
+                gattServer = await bluetoothDevice.gatt.connect();
+                const service = await gattServer.getPrimaryService(svcUuid);
+                notifyChar = await service.getCharacteristic(ntfUuid);
+                await notifyChar.startNotifications();
+                notifyChar.addEventListener('characteristicvaluechanged', onNotification);
+                updateBleUI(true);
+                bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnect);
+                showToast('蓝牙已连接');
+            } catch (e) {
+                showToast('连接失败');
+                updateBleUI(false);
+            }
+        }
+
+        function onDisconnect() {
+            if (notifyChar) notifyChar.removeEventListener('characteristicvaluechanged', onNotification);
+            notifyChar = null;
+            updateBleUI(false);
+            showToast('蓝牙已断开');
+        }
+
+        function disconnect() {
+            if (bluetoothDevice && bluetoothDevice.gatt.connected) {
+                bluetoothDevice.gatt.disconnect();
+            } else {
+                onDisconnect();
+            }
+        }
+
+        // 折叠蓝牙面板
+        btConfigBtn.addEventListener('click', () => {
+            btPanel.style.display = btPanel.style.display === 'none' ? 'flex' : 'none';
         });
-        bluetoothDevice = device;
-        connectBtn.disabled = false;
-        addLog(`已选择设备: ${device.name || device.id}`);
-      } catch(e) {
-        if (!e.message.includes('cancelled')) addLog(`扫描错误: ${e.message}`);
-      }
-    }
+        scanBtn.addEventListener('click', scan);
+        connectBtn.addEventListener('click', connect);
+        disconnectBtn.addEventListener('click', disconnect);
 
-    async function connect() {
-      if (!bluetoothDevice) return;
-      const svc = serviceUuidInput.value.trim();
-      const ntf = notifyUuidInput.value.trim();
-      const wrt = writeUuidInput.value.trim();
-      try {
-        gattServer = await bluetoothDevice.gatt.connect();
-        const service = await gattServer.getPrimaryService(svc);
-        notifyChar = await service.getCharacteristic(ntf);
-        await notifyChar.startNotifications();
-        notifyChar.addEventListener('characteristicvaluechanged', onNotification);
-        if (wrt) {
-          try { writeChar = await service.getCharacteristic(wrt); } catch(e) {}
+        // 初始化
+        function init() {
+            buildGrid();
+            drawGauge(0);
+            updateContactUI(1); // 初始未接触
+            updateBleUI(false);
         }
-        updateConnectionUI(true);
-        bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnect);
-        addLog('✅ 蓝牙已连接');
-      } catch(e) {
-        addLog(`连接失败: ${e.message}`);
-        updateConnectionUI(false);
-      }
-    }
-
-    function onDisconnect() {
-      addLog('设备断开');
-      if (notifyChar) notifyChar.removeEventListener('characteristicvaluechanged', onNotification);
-      notifyChar = null;
-      writeChar = null;
-      updateConnectionUI(false);
-    }
-
-    function disconnect() {
-      if (bluetoothDevice && bluetoothDevice.gatt.connected) bluetoothDevice.gatt.disconnect();
-      else onDisconnect();
-    }
-
-    // 模拟数据
-    function simulateData() {
-      const force = (Math.random() * 5).toFixed(1);
-      const feedback = Math.floor(Math.random() * 160 + 20);
-      const raw = `#${force}#${feedback}#`;
-      addLog(`模拟接收: ${raw}`, 'rx');
-      parseSensorData(raw);
-    }
-
-    configToggleBtn.addEventListener('click', ()=> configPanel.style.display = configPanel.style.display==='none'?'flex':'none');
-    scanBtn.addEventListener('click', scan);
-    connectBtn.addEventListener('click', connect);
-    disconnectBtn.addEventListener('click', disconnect);
-    simulateBtn.addEventListener('click', simulateData);
-
-    updateConnectionUI(false);
-    updateOutputModel(100);
-    addLog('抓痒头调试助手已启动，拖动滑块实时下发');
-  })();
+        init();
+    })();
 </script>
 </body>
 </html>
