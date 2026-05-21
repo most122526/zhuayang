@@ -1,560 +1,1158 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>江理工 · 校园导航播报</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
-      background: #0b1a2f;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 10px;
-      color: #e0e8f0;
-    }
-    .phone-frame {
-      max-width: 420px;
-      width: 100%;
-      background: #0f1a2b;
-      border-radius: 44px;
-      box-shadow: 0 30px 50px rgba(0,0,0,0.7), inset 0 0 0 2px #2a3a4e;
-      padding: 16px 12px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      position: relative;
-      border: 1px solid #3e5670;
-      overflow: hidden;
-    }
-    .status-bar-phone {
-      display: flex;
-      justify-content: space-between;
-      padding: 0 8px;
-      font-size: 0.7rem;
-      color: #9aaec9;
-    }
-    .app-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #1a2e42;
-      border-radius: 30px;
-      padding: 8px 16px;
-      border: 1px solid #3e5a78;
-    }
-    .app-header i { color:#f1c40f; font-size:1.2rem; }
-    .app-header h1 { font-size:1rem; font-weight:700; }
-    .panel {
-      background: #162433;
-      border-radius: 24px;
-      padding: 12px;
-      border: 1px solid #2e4055;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.4);
-    }
-    .section-title {
-      font-weight:700; font-size:0.8rem; color:#b0c6dc;
-      display:flex; align-items:center; gap:6px;
-      border-bottom:1px solid #2a3f53; padding-bottom:6px;
-    }
-    .map-container {
-      width:100%; height:280px; border-radius:18px; overflow:hidden;
-      border:1px solid #3e5a78; background:#0a121c;
-    }
-    .search-box {
-      display:flex; gap:6px; align-items:center;
-    }
-    .search-box input {
-      flex:1; background:#0a121c; border:1px solid #4b6f92;
-      color:white; padding:8px 14px; border-radius:22px; font-size:0.7rem; outline:none;
-    }
-    .btn {
-      background:#2c4b6e; border:none; padding:6px 12px; border-radius:20px;
-      font-weight:600; font-size:0.65rem; color:white; cursor:pointer;
-      display:flex; align-items:center; gap:4px; border:1px solid #4b6f92;
-      white-space:nowrap; transition:0.2s;
-    }
-    .btn:active { transform:scale(0.95); }
-    .btn-accent { background:#e67e22; border-color:#f39c12; }
-    .btn-success { background:#1e7a3e; border-color:#2ecc71; }
-    .btn-warning { background:#b8730a; border-color:#f1c40f; }
-    .btn-danger { background:#9b1d1d; border-color:#e74c3c; }
-    .btn-outline { background:transparent; border:1px solid #4b6f92; color:#b0c6dc; }
-    .btn-detector {
-      background: #1e3a5f;
-      border: 2px solid #3498db;
-      color: #fff;
-      padding: 10px 18px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 15px rgba(52,152,219,0.3);
-    }
-    .btn-detector:disabled { opacity:0.6; }
-    .voice-bar {
-      background:#1e2e40; border-radius:18px; padding:8px 14px;
-      display:flex; align-items:center; gap:8px; font-size:0.7rem;
-    }
-    .voice-bar i { color:#2ecc71; }
-    .toast-message {
-      position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
-      background:#27ae60; color:white; padding:8px 22px; border-radius:20px;
-      font-weight:600; font-size:0.8rem; z-index:999; opacity:0; transition:opacity 0.3s;
-      pointer-events:none;
-    }
-    .toast-message.show { opacity:1; }
-    .toast-message.error { background:#c0392b; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>抓仰头控制界面 · 江理工</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --card2: #1a2332;
+            --accent: #38bdf8;
+            --accent2: #06b6d4;
+            --green: #10b981;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --text: #f1f5f9;
+            --text2: #94a3b8;
+            --text3: #64748b;
+            --border: #334155;
+            --border2: #1e293b;
+            --radius: 18px;
+            --radius-sm: 12px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'JetBrains Mono', monospace;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(160deg, #0f172a 0%, #0b1121 40%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            color: var(--text);
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .phone {
+            max-width: 440px;
+            width: 100%;
+            background: var(--bg);
+            border-radius: 32px;
+            padding: 16px 14px 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            border: 1px solid #2a3545;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-    /* 底部蓝牙面板 */
-    .bt-manager {
-      position:fixed; bottom:0; left:0; right:0; z-index:50;
-      background:rgba(15,25,35,0.97); border-top:2px solid #2e4055;
-      border-radius:28px 28px 0 0; padding:12px; max-height:70vh;
-      overflow-y:auto; transform:translateY(100%); transition:transform 0.35s ease;
-      margin:0 auto; max-width:420px; box-shadow:0 -10px 30px rgba(0,0,0,0.5);
-    }
-    .bt-manager.open { transform:translateY(0); }
-    .toggle-bt-btn {
-      position:fixed; bottom:16px; left:50%; transform:translateX(-50%); z-index:51;
-      background:#1e3a5f; color:white; border:2px solid #3498db;
-      padding:10px 24px; border-radius:30px; font-weight:700; font-size:0.8rem;
-      cursor:pointer; display:flex; align-items:center; gap:8px;
-      box-shadow:0 4px 20px rgba(52,152,219,0.3);
-    }
-    .bt-device {
-      background:#1c2e41; border-radius:14px; padding:8px; display:flex;
-      align-items:center; justify-content:space-between; border:1px solid #36506b; margin-bottom:6px;
-    }
-    .bt-device i { color:#3498db; font-size:1rem; }
-    .bt-info { flex:1; margin:0 8px; }
-    .bt-name { font-weight:700; font-size:0.7rem; }
-    .bt-status { font-size:0.55rem; color:#7f95b2; }
-    .bt-actions { display:flex; gap:4px; }
-    .uuid-row { display:flex; gap:4px; font-size:0.55rem; align-items:center; flex-wrap:wrap; }
-    .uuid-row input { background:#0a121c; border:1px solid #3e5a78; color:#aaa; padding:4px 6px; border-radius:12px; width:110px; font-family:monospace; }
-  </style>
+        /* 顶部标题栏 */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 8px;
+            gap: 10px;
+        }
+        .header .title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header .logo-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #0c4a6e, #0e7490);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(14, 116, 144, 0.4);
+        }
+        .header h1 {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #e2e8f0;
+            line-height: 1.2;
+        }
+        .header .subtitle {
+            font-size: 0.65rem;
+            color: var(--text3);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .header .badge-school {
+            font-size: 0.6rem;
+            padding: 4px 10px;
+            border-radius: 14px;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent);
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+        }
+
+        /* 状态指示灯条 */
+        .status-strip {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .status-chip {
+            flex: 1;
+            min-width: 80px;
+            background: var(--card2);
+            border-radius: 20px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        .status-chip .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #475569;
+            flex-shrink: 0;
+            transition: 0.3s;
+        }
+        .status-chip .dot.connected {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+            animation: dotPulse 2s infinite;
+        }
+        .status-chip .dot.cloud {
+            background: #f59e0b;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+        }
+        .status-chip .dot.cloud.ok {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+        }
+        @keyframes dotPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 16px rgba(16, 185, 129, 0.8);
+            }
+        }
+        .status-chip .chip-label {
+            color: var(--text2);
+            font-size: 0.6rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-chip .chip-val {
+            color: #e2e8f0;
+            font-weight: 700;
+            font-size: 0.68rem;
+        }
+
+        /* 蓝牙配置面板 */
+        .config-panel {
+            display: none;
+            background: var(--card2);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            flex-direction: column;
+            gap: 8px;
+            border: 1px solid var(--border);
+        }
+        .config-panel.open {
+            display: flex;
+        }
+        .config-panel input {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: #e2e8f0;
+            padding: 7px 10px;
+            border-radius: 10px;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            flex: 1;
+            outline: none;
+            min-width: 0;
+        }
+        .config-panel input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
+        }
+        .config-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .config-row label {
+            font-size: 0.55rem;
+            color: var(--text3);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+            min-width: 50px;
+        }
+        .btn {
+            background: #1e3348;
+            border: 1px solid #334155;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.65rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.15s;
+            white-space: nowrap;
+            font-family: inherit;
+            outline: none;
+        }
+        .btn:active {
+            transform: scale(0.95);
+            background: #2a4058;
+        }
+        .btn-primary {
+            background: #0e7490;
+            border-color: #0891b2;
+            color: #fff;
+        }
+        .btn-primary:active {
+            background: #0c5e72;
+        }
+        .btn-accent {
+            background: #0c4a6e;
+            border-color: #0e7490;
+            color: #7dd3fc;
+        }
+        .btn-warn {
+            background: #7f1d1d;
+            border-color: #991b1b;
+            color: #fecaca;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.6rem;
+            border-radius: 14px;
+        }
+
+        /* 数据接收展示区 */
+        .data-receive-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .data-receive-card .section-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text3);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .data-receive-card .section-label i {
+            color: var(--accent);
+            font-size: 0.7rem;
+        }
+        .reading-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .reading-box {
+            flex: 1;
+            min-width: 110px;
+            background: var(--card2);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        .reading-box .reading-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #e2e8f0;
+            font-family: var(--font-mono);
+            line-height: 1;
+            transition: 0.3s;
+        }
+        .reading-box .reading-value.updated {
+            animation: valueFlash 0.5s ease;
+        }
+        @keyframes valueFlash {
+            0%,
+            100% {
+                color: #e2e8f0;
+            }
+            50% {
+                color: #38bdf8;
+                transform: scale(1.04);
+            }
+        }
+        .reading-box .reading-unit {
+            font-size: 0.6rem;
+            color: var(--text3);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .reading-box .reading-label {
+            font-size: 0.62rem;
+            color: var(--text2);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        .contact-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            transition: 0.3s;
+        }
+        .contact-indicator.contact-yes {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        .contact-indicator.contact-no {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .contact-indicator.contact-unknown {
+            background: rgba(100, 116, 139, 0.2);
+            color: #94a3b8;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+        .last-update-text {
+            font-size: 0.58rem;
+            color: var(--text3);
+            text-align: right;
+            font-family: var(--font-mono);
+        }
+
+        /* 舵机角度控制区 */
+        .servo-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .servo-card .section-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text3);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .servo-card .section-label i {
+            color: var(--accent2);
+            font-size: 0.7rem;
+        }
+        .servo-display-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .servo-angle-display {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent2) 0deg,
+                    var(--accent2) calc(var(--angle-deg) * 1deg),
+                    #1e3348 calc(var(--angle-deg) * 1deg),
+                    #1e3348 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 3px solid #334155;
+            transition: background 0.15s;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+        }
+        .servo-angle-display .angle-num {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fff;
+            font-family: var(--font-mono);
+            z-index: 1;
+            text-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+        }
+        .servo-angle-display .angle-deg-symbol {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            position: absolute;
+            bottom: 16px;
+            font-weight: 600;
+        }
+        .servo-slider-group {
+            flex: 1;
+            min-width: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .servo-slider-group input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 28px;
+            border-radius: 14px;
+            background: linear-gradient(90deg, #0c4a6e 0%, #0e7490 50%, #06b6d4 100%);
+            outline: none;
+            cursor: pointer;
+            border: 2px solid #334155;
+        }
+        .servo-slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #06b6d4;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(6, 182, 212, 0.5);
+            transition: 0.15s;
+        }
+        .servo-slider-group input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+            box-shadow: 0 6px 24px rgba(6, 182, 212, 0.7);
+        }
+        .servo-preset-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .servo-preset-row .btn {
+            flex: 1;
+            min-width: 36px;
+            justify-content: center;
+            font-size: 0.6rem;
+            padding: 6px 8px;
+            border-radius: 14px;
+        }
+        .servo-input-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .servo-input-row input {
+            width: 70px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: #e2e8f0;
+            padding: 6px 8px;
+            border-radius: 10px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-align: center;
+            outline: none;
+        }
+        .servo-input-row input:focus {
+            border-color: var(--accent2);
+        }
+
+        /* 日志区域 */
+        .log-card {
+            background: var(--card2);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .log-card .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .log-box {
+            background: #0b1121;
+            border-radius: 10px;
+            padding: 8px 10px;
+            height: 110px;
+            overflow-y: auto;
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            color: #94a3b8;
+            border: 1px solid #1a2332;
+            line-height: 1.6;
+            word-break: break-all;
+        }
+        .log-entry {
+            padding: 2px 0;
+            border-bottom: 1px solid #111827;
+        }
+        .log-entry.rx {
+            color: #6ee7b7;
+        }
+        .log-entry.tx {
+            color: #7dd3fc;
+        }
+        .log-entry.cloud-log {
+            color: #fbbf24;
+        }
+        .log-entry.system {
+            color: #94a3b8;
+        }
+        .log-entry.error {
+            color: #fca5a5;
+        }
+        .timestamp {
+            color: #475569;
+            margin-right: 6px;
+            font-size: 0.52rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            padding: 10px 22px;
+            border-radius: 24px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            background: #0e7490;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            animation: toastIn 0.35s, toastOut 0.35s 2s forwards;
+            pointer-events: none;
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-16px);
+            }
+        }
+        .toast.warn {
+            background: #b45309;
+        }
+        .toast.error {
+            background: #b91c1c;
+        }
+    </style>
 </head>
 <body>
-<div class="phone-frame">
-  <div class="status-bar-phone">
-    <span>9:41</span>
-    <span><i class="fas fa-signal"></i> <i class="fas fa-wifi"></i> <i class="fas fa-battery-full"></i></span>
-  </div>
-  <div class="app-header">
-    <i class="fas fa-map-marked-alt"></i>
-    <div>
-      <h1>江理工导航</h1>
-      <span style="font-size:0.55rem; color:#7f95b2;">蓝牙信标 · 语音导游</span>
-    </div>
-  </div>
-
-  <!-- 地图区域 -->
-  <div class="map-container" id="mapContainer">
-    <div style="padding:20px; text-align:center; color:#7f95b2;">地图加载中...</div>
-  </div>
-
-  <!-- 搜索与检测按钮 -->
-  <div class="panel">
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="搜索图书馆、体育馆、行政楼...">
-      <button class="btn btn-warning" id="searchBtn"><i class="fas fa-search"></i></button>
-    </div>
-    <button class="btn-detector" id="detectBeaconBtn">
-      <i class="fas fa-bluetooth-b"></i> 检测蓝牙信标
-    </button>
-    <div class="voice-bar" id="voiceBar">
-      <i class="fas fa-volume-up"></i>
-      <span id="voiceText" style="flex:1;">等待导航指令...</span>
-      <span style="font-size:0.6rem; color:#7f95b2;" id="voiceTime"></span>
-      <button class="btn btn-outline" id="stopVoiceBtn" style="padding:4px 10px;"><i class="fas fa-volume-mute"></i></button>
-    </div>
-  </div>
-</div>
-
-<!-- 底部蓝牙管理按钮 -->
-<button class="toggle-bt-btn" id="toggleBtBtn"><i class="fas fa-bluetooth-b"></i> 蓝牙管理</button>
-
-<!-- 底部蓝牙面板 -->
-<div class="bt-manager" id="btManager">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-    <span style="font-weight:700; font-size:0.9rem;"><i class="fas fa-bluetooth"></i> 蓝牙信标管理</span>
-    <button class="btn btn-outline" id="closeBtBtn" style="padding:4px 12px;"><i class="fas fa-times"></i></button>
-  </div>
-  <div class="uuid-row" style="margin-bottom:8px;">
-    <span>服务UUID</span>
-    <input id="serviceUuid" value="0000fff0-0000-1000-8000-00805f9b34fb">
-    <span>写入UUID</span>
-    <input id="writeUuid" value="0000fff2-0000-1000-8000-00805f9b34fb">
-  </div>
-  <div id="btDeviceList" style="display:flex; flex-direction:column; gap:6px;"></div>
-  <div style="margin-top:8px; font-size:0.65rem; color:#b0c6dc;">
-    <i class="fas fa-info-circle"></i> 配对顺序对应指令：1→A, 2→B, 3→C
-  </div>
-</div>
-
-<div class="toast-message" id="toast"></div>
-
-<script>
-  (function() {
-    // 高德地图配置
-    const AMAP_KEY = '6d2f2e12162bdea11ad316ecd445ebe4';
-    const AMAP_SECRET = '7ea6cc8dad3a9af11642f487735e0766';
-    const CAMPUS_CENTER = [119.918224, 31.750682];
-
-    // 信标指令映射
-    const BEACON_LETTERS = ['A', 'B', 'C'];
-    let beacons = [null, null, null];
-    let beaconNames = ['', '', ''];        // 已保存的信标名称
-    let connectedBeacons = [false, false, false];
-    let writeChars = [null, null, null];
-    let gattServers = [null, null, null];
-
-    let mapInstance = null;
-    let currentPosition = CAMPUS_CENTER;
-    let voiceEnabled = true;
-    let walkingRoute = null;
-
-    // 校园建筑数据
-    const buildings = [
-      { name: '图书馆', lng: 119.9178, lat: 31.7505, beaconId: 2, desc: '常州高校最大图书馆，9层馆舍' },
-      { name: '行政楼(20#)', lng: 119.9180, lat: 31.7498, beaconId: 1, desc: '学校行政办公主楼' },
-      { name: '体育馆', lng: 119.9192, lat: 31.7518, beaconId: 2, desc: '主体育馆，内含篮球场与乒乓馆' },
-      { name: '羽毛球馆', lng: 119.9198, lat: 31.7530, beaconId: 3, desc: '西苑宿舍后方，专业羽毛球场' },
-      { name: '博学楼(59#)', lng: 119.9185, lat: 31.7512, beaconId: 1, desc: '江苏理工学院主教楼' },
-      { name: '第一食堂', lng: 119.9175, lat: 31.7520, beaconId: 3, desc: '主校区第一食堂' },
-      { name: '第二食堂(46#)', lng: 119.9182, lat: 31.7523, beaconId: 3, desc: '主校区第二食堂' },
-      { name: '宿舍楼群', lng: 119.9195, lat: 31.7525, beaconId: 3, desc: '学生宿舍区域' },
-      { name: '凌波桥', lng: 119.9172, lat: 31.7508, beaconId: 2, desc: '凌波湖畔标志性桥梁' },
-    ];
-
-    // DOM元素
-    const btDeviceList = document.getElementById('btDeviceList');
-    const detectBeaconBtn = document.getElementById('detectBeaconBtn');
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
-    const voiceText = document.getElementById('voiceText');
-    const voiceTime = document.getElementById('voiceTime');
-    const toast = document.getElementById('toast');
-    const stopVoiceBtn = document.getElementById('stopVoiceBtn');
-    const toggleBtBtn = document.getElementById('toggleBtBtn');
-    const btManager = document.getElementById('btManager');
-    const closeBtBtn = document.getElementById('closeBtBtn');
-    const serviceUuidInput = document.getElementById('serviceUuid');
-    const writeUuidInput = document.getElementById('writeUuid');
-
-    // Toast
-    function showToast(msg, isError=false) {
-      toast.textContent = msg;
-      toast.className = 'toast-message ' + (isError ? 'error' : '') + ' show';
-      setTimeout(() => { toast.className = 'toast-message'; }, 2500);
-    }
-
-    // 语音
-    function speak(text) {
-      if (!voiceEnabled) return;
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'zh-CN'; utter.rate = 1.1;
-        utter.onstart = () => {
-          voiceText.textContent = text;
-          voiceTime.textContent = new Date().toLocaleTimeString('zh-CN');
-        };
-        window.speechSynthesis.speak(utter);
-      }
-    }
-    stopVoiceBtn.addEventListener('click', () => {
-      voiceEnabled = !voiceEnabled;
-      stopVoiceBtn.innerHTML = voiceEnabled ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
-      if (!voiceEnabled) window.speechSynthesis.cancel();
-    });
-
-    // 蓝牙面板折叠
-    toggleBtBtn.addEventListener('click', () => btManager.classList.toggle('open'));
-    closeBtBtn.addEventListener('click', () => btManager.classList.remove('open'));
-
-    // 渲染蓝牙管理卡片
-    function renderBeaconUI() {
-      let html = '';
-      for (let i=0; i<3; i++) {
-        const connected = connectedBeacons[i];
-        const name = beaconNames[i] || `信标 ${i+1}`;
-        html += `
-          <div class="bt-device">
-            <i class="fas fa-${connected?'bluetooth':'bluetooth-b'}" style="color:${connected?'#2ecc71':'#5c6b7a'}"></i>
-            <div class="bt-info">
-              <div class="bt-name">${name} <span style="color:#f1c40f;">[${BEACON_LETTERS[i]}]</span></div>
-              <div class="bt-status">${connected?'✓ 已连接':'未连接'}</div>
+    <div class="phone" id="app">
+        <!-- 标题栏 -->
+        <div class="header">
+            <div class="title-group">
+                <div class="logo-icon">🦾</div>
+                <div>
+                    <h1>抓仰头控制界面</h1>
+                    <div class="subtitle">Head Grasp & Tilt · 实时监控</div>
+                </div>
             </div>
-            <div class="bt-actions">
-              <button class="btn" id="scanBtn${i}">扫描</button>
-              <button class="btn btn-success" id="connectBtn${i}" ${connected?'disabled':''}>连接</button>
+            <span class="badge-school">江理工</span>
+        </div>
+
+        <!-- 状态指示灯 -->
+        <div class="status-strip">
+            <div class="status-chip" id="bleStatusChip">
+                <div class="dot" id="bleDot"></div>
+                <div>
+                    <div class="chip-label">蓝牙</div>
+                    <div class="chip-val" id="bleStatusText">未连接</div>
+                </div>
             </div>
-          </div>
-        `;
-      }
-      btDeviceList.innerHTML = html;
-      for (let i=0; i<3; i++) {
-        document.getElementById(`scanBtn${i}`)?.addEventListener('click', ()=> scanAndSaveBeacon(i));
-        document.getElementById(`connectBtn${i}`)?.addEventListener('click', ()=> connectBeacon(i));
-      }
-    }
+            <div class="status-chip" id="cloudStatusChip">
+                <div class="dot" id="cloudDot"></div>
+                <div>
+                    <div class="chip-label">云端</div>
+                    <div class="chip-val" id="cloudStatusText">待上传</div>
+                </div>
+            </div>
+            <div class="status-chip">
+                <div style="font-size:0.7rem;">📶</div>
+                <div>
+                    <div class="chip-label">数据计数</div>
+                    <div class="chip-val" id="dataCount">0</div>
+                </div>
+            </div>
+        </div>
 
-    async function scanAndSaveBeacon(index) {
-      if (!navigator.bluetooth) { showToast('浏览器不支持蓝牙', true); return; }
-      const svc = serviceUuidInput.value.trim();
-      if (!svc) { showToast('填写服务UUID', true); return; }
-      try {
-        showToast(`正在扫描信标 ${index+1}...`);
-        const device = await navigator.bluetooth.requestDevice({
-          filters: [{ services: [svc] }],
-          optionalServices: [svc]
-        });
-        beacons[index] = device;
-        beaconNames[index] = device.name || `信标${index+1}`;
-        showToast(`已保存: ${beaconNames[index]}`);
-        renderBeaconUI();
-        document.getElementById(`connectBtn${index}`).disabled = false;
-      } catch(e) {
-        if (!e.message.includes('cancelled')) showToast('扫描失败', true);
-      }
-    }
+        <!-- 蓝牙配置面板 -->
+        <div class="config-panel" id="configPanel">
+            <div class="config-row">
+                <label>服务UUID</label>
+                <input id="serviceUuid" value="0000fff0-0000-1000-8000-00805f9b34fb" placeholder="服务UUID">
+            </div>
+            <div class="config-row">
+                <label>通知UUID</label>
+                <input id="notifyUuid" value="0000fff1-0000-1000-8000-00805f9b34fb" placeholder="通知UUID">
+            </div>
+            <div class="config-row">
+                <label>写入UUID</label>
+                <input id="writeUuid" value="0000fff1-0000-1000-8000-00805f9b34fb" placeholder="写入UUID">
+            </div>
+            <div class="config-row" style="gap:8px;">
+                <button class="btn btn-accent" id="scanBtn"><i class="fas fa-search"></i> 扫描设备</button>
+                <button class="btn btn-primary" id="connectBtn" disabled>🔗 连接</button>
+                <button class="btn btn-warn" id="disconnectBtn" disabled>✕ 断开</button>
+                <button class="btn btn-sm" id="configToggleBtn" style="margin-left:auto;">
+                    <i class="fas fa-chevron-up"></i> 收起
+                </button>
+            </div>
+        </div>
 
-    async function connectBeacon(index) {
-      const device = beacons[index];
-      if (!device) { showToast('请先扫描设备', true); return; }
-      const svc = serviceUuidInput.value.trim();
-      const wUuid = writeUuidInput.value.trim();
-      try {
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService(svc);
-        const writeChar = await service.getCharacteristic(wUuid);
-        gattServers[index] = server;
-        writeChars[index] = writeChar;
-        connectedBeacons[index] = true;
-        device.addEventListener('gattserverdisconnected', () => {
-          connectedBeacons[index] = false;
-          writeChars[index] = null;
-          renderBeaconUI();
-          showToast(`信标${index+1}已断开`, true);
-        });
-        renderBeaconUI();
-        showToast(`信标${index+1}已连接`);
-      } catch(e) {
-        showToast('连接失败: '+e.message, true);
-      }
-    }
+        <!-- 蓝牙操作快捷栏（配置收起时显示） -->
+        <div class="config-row" id="quickBtns" style="gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-sm" id="configShowBtn" style="display:flex; align-items:center; gap:4px;">
+                <i class="fas fa-cog"></i> 蓝牙配置
+            </button>
+            <button class="btn btn-accent btn-sm" id="scanBtn2"><i class="fas fa-search"></i> 扫描</button>
+            <button class="btn btn-primary btn-sm" id="connectBtn2" disabled>🔗 连接</button>
+            <button class="btn btn-warn btn-sm" id="disconnectBtn2" disabled>✕ 断开</button>
+        </div>
 
-    async function sendCommand(index, letter, silent=false) {
-      if (!connectedBeacons[index] || !writeChars[index]) return false;
-      try {
-        const data = new TextEncoder().encode(letter);
-        if (writeChars[index].properties?.writeWithoutResponse) {
-          await writeChars[index].writeValueWithoutResponse(data);
-        } else {
-          await writeChars[index].writeValue(data);
-        }
-        if (!silent) console.log(`指令 ${letter} 已发送至信标${index+1}`);
-        return true;
-      } catch(e) {
-        console.error('发送失败:', e);
-        return false;
-      }
-    }
+        <!-- 数据接收展示 -->
+        <div class="data-receive-card">
+            <div class="section-label">
+                <i class="fas fa-download"></i> 蓝牙接收数据 · 实时解析
+            </div>
+            <div class="reading-row">
+                <div class="reading-box" id="forceBox">
+                    <div class="reading-value" id="forceValue">--</div>
+                    <div class="reading-unit">N / 单位</div>
+                    <div class="reading-label">📐 力反馈数据</div>
+                </div>
+                <div class="reading-box" id="contactBox">
+                    <div style="margin-bottom:6px;">
+                        <span class="contact-indicator contact-unknown" id="contactIndicator">
+                            <i class="fas fa-circle-question"></i> 等待数据
+                        </span>
+                    </div>
+                    <div class="reading-unit" style="margin-top:4px;">检测状态</div>
+                    <div class="reading-label">🖐️ 是否接触背部</div>
+                </div>
+            </div>
+            <div class="last-update-text" id="lastUpdateTime">最后更新: --</div>
+        </div>
 
-    // 核心功能：检测蓝牙信标
-    detectBeaconBtn.addEventListener('click', async () => {
-      if (!navigator.bluetooth) {
-        showToast('浏览器不支持蓝牙', true);
-        return;
-      }
-      // 检查是否有已保存的信标名称
-      const savedNames = beaconNames.filter(n => n !== '');
-      if (savedNames.length === 0) {
-        showToast('请先在蓝牙管理中保存信标名称', true);
-        return;
-      }
+        <!-- 舵机角度控制 -->
+        <div class="servo-card">
+            <div class="section-label">
+                <i class="fas fa-upload"></i> 舵机角度控制 · 蓝牙实时下发
+            </div>
+            <div class="servo-display-row">
+                <div class="servo-angle-display" id="servoAngleDisplay" style="--angle-deg:90;">
+                    <span class="angle-num" id="servoAngleNum">90</span>
+                    <span class="angle-deg-symbol">°</span>
+                </div>
+                <div class="servo-slider-group">
+                    <input type="range" id="servoSlider" min="0" max="180" value="90" step="1" title="舵机角度滑块">
+                    <div style="display:flex;justify-content:space-between;font-size:0.55rem;color:var(--text3);padding:0 4px;">
+                        <span>0°</span><span>45°</span><span>90°</span><span>135°</span><span>180°</span>
+                    </div>
+                </div>
+            </div>
+            <div class="servo-input-row">
+                <span style="font-size:0.6rem;color:var(--text3);font-weight:600;">精确角度:</span>
+                <input type="number" id="servoInput" min="0" max="180" value="90" step="1">
+                <span style="font-size:0.6rem;color:var(--text3);">°</span>
+                <button class="btn btn-accent btn-sm" id="servoSetBtn">设置</button>
+                <span style="font-size:0.55rem;color:var(--text3);margin-left:4px;">下发格式: #角度#</span>
+            </div>
+            <div class="servo-preset-row">
+                <button class="btn btn-sm servo-preset" data-angle="0">0°</button>
+                <button class="btn btn-sm servo-preset" data-angle="30">30°</button>
+                <button class="btn btn-sm servo-preset" data-angle="60">60°</button>
+                <button class="btn btn-sm servo-preset" data-angle="90">90°</button>
+                <button class="btn btn-sm servo-preset" data-angle="120">120°</button>
+                <button class="btn btn-sm servo-preset" data-angle="150">150°</button>
+                <button class="btn btn-sm servo-preset" data-angle="180">180°</button>
+            </div>
+        </div>
 
-      const svc = serviceUuidInput.value.trim();
-      if (!svc) {
-        showToast('请填写服务UUID', true);
-        return;
-      }
+        <!-- 日志 -->
+        <div class="log-card">
+            <div class="log-header">
+                <span style="font-size:0.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">
+                    📋 事件日志
+                </span>
+                <button class="btn btn-sm" id="clearLogBtn" style="font-size:0.5rem;padding:3px 8px;">清空</button>
+            </div>
+            <div class="log-box" id="logBox">
+                <div class="log-entry system"><span class="timestamp">--:--:--</span> 抓仰头控制界面已就绪</div>
+                <div class="log-entry system"><span class="timestamp">--:--:--</span> 巴法云UID: fb63beb6... | 主题: zhuayanghead</div>
+                <div class="log-entry system"><span class="timestamp">--:--:--</span> 请配置蓝牙并连接设备</div>
+            </div>
+        </div>
+    </div>
 
-      try {
-        const device = await navigator.bluetooth.requestDevice({
-          filters: [{ services: [svc] }],
-          optionalServices: [svc]
-        });
+    <div id="toastContainer"></div>
 
-        const deviceName = device.name || '';
-        // 在已保存的信标中查找匹配名称
-        const foundIndex = beaconNames.findIndex(name => name === deviceName);
-        if (foundIndex === -1) {
-          showToast('未识别：该设备不在已保存的信标列表中', true);
-          return;
-        }
+    <script>
+        (function() {
+            // ==================== DOM 元素 ====================
+            const bleDot = document.getElementById('bleDot');
+            const bleStatusText = document.getElementById('bleStatusText');
+            const cloudDot = document.getElementById('cloudDot');
+            const cloudStatusText = document.getElementById('cloudStatusText');
+            const dataCountEl = document.getElementById('dataCount');
+            const configPanel = document.getElementById('configPanel');
+            const configToggleBtn = document.getElementById('configToggleBtn');
+            const configShowBtn = document.getElementById('configShowBtn');
+            const quickBtns = document.getElementById('quickBtns');
+            const serviceUuidInput = document.getElementById('serviceUuid');
+            const notifyUuidInput = document.getElementById('notifyUuid');
+            const writeUuidInput = document.getElementById('writeUuid');
+            const scanBtn = document.getElementById('scanBtn');
+            const scanBtn2 = document.getElementById('scanBtn2');
+            const connectBtn = document.getElementById('connectBtn');
+            const connectBtn2 = document.getElementById('connectBtn2');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const disconnectBtn2 = document.getElementById('disconnectBtn2');
+            const forceValueEl = document.getElementById('forceValue');
+            const contactIndicator = document.getElementById('contactIndicator');
+            const lastUpdateTime = document.getElementById('lastUpdateTime');
+            const servoSlider = document.getElementById('servoSlider');
+            const servoAngleNum = document.getElementById('servoAngleNum');
+            const servoAngleDisplay = document.getElementById('servoAngleDisplay');
+            const servoInput = document.getElementById('servoInput');
+            const servoSetBtn = document.getElementById('servoSetBtn');
+            const logBox = document.getElementById('logBox');
+            const clearLogBtn = document.getElementById('clearLogBtn');
+            const toastContainer = document.getElementById('toastContainer');
 
-        // 连接设备并下发对应指令
-        const letter = BEACON_LETTERS[foundIndex];
-        showToast(`识别到信标${foundIndex+1}：${deviceName}，正在连接...`);
+            // ==================== 配置 ====================
+            const BEMFA_UID = 'fb63beb6921942a7a6ee44b53331075f';
+            const BEMFA_TOPIC = 'zhuayanghead';
+            let bluetoothDevice = null;
+            let gattServer = null;
+            let notifyChar = null;
+            let writeChar = null;
+            let isConnected = false;
+            let dataReceiveCount = 0;
+            let currentServoAngle = 90;
+            let servoSendTimer = null;
+            let lastServoSendTime = 0;
+            const SERVO_DEBOUNCE_MS = 80;
 
-        // 如果已经连接，直接发送指令
-        if (connectedBeacons[foundIndex]) {
-          const sent = await sendCommand(foundIndex, letter);
-          if (sent) {
-            showToast(`✓ 已向信标${foundIndex+1}发送指令 ${letter}`);
-            speak(`检测到信标${foundIndex+1}，已发送指令${letter}`);
-          }
-          return;
-        }
+            // ==================== Toast ====================
+            function showToast(msg, type = '') {
+                const t = document.createElement('div');
+                t.className = 'toast ' + type;
+                t.textContent = msg;
+                toastContainer.appendChild(t);
+                setTimeout(() => t.remove(), 2500);
+            }
 
-        // 否则连接并发送
-        const wUuid = writeUuidInput.value.trim();
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService(svc);
-        const writeChar = await service.getCharacteristic(wUuid);
-        gattServers[foundIndex] = server;
-        writeChars[foundIndex] = writeChar;
-        connectedBeacons[foundIndex] = true;
+            // ==================== 日志 ====================
+            function addLog(msg, type = 'system') {
+                const div = document.createElement('div');
+                div.className = `log-entry ${type}`;
+                div.innerHTML =
+                    `<span class="timestamp">${new Date().toLocaleTimeString('zh-CN', { hour12: false })}</span> ${msg}`;
+                logBox.appendChild(div);
+                logBox.scrollTop = logBox.scrollHeight;
+                if (logBox.children.length > 60) logBox.removeChild(logBox.children[0]);
+            }
 
-        device.addEventListener('gattserverdisconnected', () => {
-          connectedBeacons[foundIndex] = false;
-          writeChars[foundIndex] = null;
-          renderBeaconUI();
-          showToast(`信标${foundIndex+1}已断开`, true);
-        });
+            clearLogBtn.addEventListener('click', () => {
+                logBox.innerHTML = '';
+                addLog('日志已清空', 'system');
+            });
 
-        // 下发指令
-        await sendCommand(foundIndex, letter, true);
-        renderBeaconUI();
-        showToast(`✓ 已连接信标${foundIndex+1}并发送指令 ${letter}`);
-        speak(`检测到信标${foundIndex+1}，已发送指令${letter}`);
-      } catch(e) {
-        if (!e.message.includes('cancelled') && !e.message.includes('取消')) {
-          showToast('扫描失败: ' + e.message, true);
-        }
-      }
-    });
+            // ==================== 配置面板切换 ====================
+            function showConfigPanel() {
+                configPanel.classList.add('open');
+                quickBtns.style.display = 'none';
+            }
 
-    // 初始化高德地图
-    function initMap() {
-      if (typeof AMap === 'undefined') {
-        setTimeout(initMap, 500);
-        return;
-      }
-      mapInstance = new AMap.Map('mapContainer', {
-        center: CAMPUS_CENTER,
-        zoom: 16,
-        viewMode: '2D',
-        resizeEnable: true,
-      });
+            function hideConfigPanel() {
+                configPanel.classList.remove('open');
+                quickBtns.style.display = 'flex';
+            }
+            configToggleBtn.addEventListener('click', hideConfigPanel);
+            configShowBtn.addEventListener('click', showConfigPanel);
+            // 初始状态：显示快捷栏，隐藏配置面板
+            hideConfigPanel();
 
-      // 定位
-      AMap.plugin('AMap.Geolocation', () => {
-        const geolocation = new AMap.Geolocation({ enableHighAccuracy: true, timeout: 5000 });
-        mapInstance.addControl(geolocation);
-        geolocation.getCurrentPosition((status, result) => {
-          if (status === 'complete' && result.position) {
-            currentPosition = [result.position.lng, result.position.lat];
-            mapInstance.setCenter(currentPosition);
-            addCurrentPositionMarker();
-          }
-        });
-      });
+            // ==================== 更新UI ====================
+            function updateConnectionUI(connected) {
+                isConnected = connected;
+                bleDot.classList.toggle('connected', connected);
+                bleStatusText.textContent = connected ? '已连接' : '未连接';
+                connectBtn.disabled = connected || !bluetoothDevice;
+                connectBtn2.disabled = connected || !bluetoothDevice;
+                disconnectBtn.disabled = !connected;
+                disconnectBtn2.disabled = !connected;
+                scanBtn.disabled = connected;
+                scanBtn2.disabled = connected;
+                if (connected) {
+                    bleStatusText.style.color = '#6ee7b7';
+                } else {
+                    bleStatusText.style.color = '#e2e8f0';
+                }
+            }
 
-      // 添加建筑标记
-      buildings.forEach(b => {
-        const marker = new AMap.Marker({
-          position: [b.lng, b.lat],
-          title: b.name,
-          map: mapInstance,
-        });
-        marker.on('click', () => navigateToBuilding(b));
-      });
+            function updateCloudStatus(ok) {
+                if (ok) {
+                    cloudDot.classList.add('ok');
+                    cloudStatusText.textContent = '已上传';
+                    cloudStatusText.style.color = '#6ee7b7';
+                } else {
+                    cloudDot.classList.remove('ok');
+                    cloudStatusText.textContent = '待上传';
+                    cloudStatusText.style.color = '#e2e8f0';
+                }
+            }
 
-      // 搜索插件
-      AMap.plugin(['AMap.AutoComplete'], () => {
-        const autoComplete = new AMap.AutoComplete({ input: 'searchInput', city: '常州' });
-        autoComplete.on('select', (e) => {
-          if (e.poi && e.poi.location) {
-            const loc = [e.poi.location.lng, e.poi.location.lat];
-            mapInstance.setCenter(loc);
-            mapInstance.setZoom(17);
-            const matched = buildings.find(b => b.name.includes(e.poi.name) || e.poi.name.includes(b.name));
-            if (matched) navigateToBuilding(matched);
-          }
-        });
-      });
-    }
+            function updateDataCount() {
+                dataCountEl.textContent = dataReceiveCount;
+            }
 
-    function addCurrentPositionMarker() {
-      new AMap.Marker({
-        position: currentPosition,
-        title: '我的位置',
-        map: mapInstance,
-        icon: new AMap.Icon({
-          size: new AMap.Size(24, 24),
-          image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_r.png',
-          imageSize: new AMap.Size(24, 24),
-        }),
-      });
-    }
+            // ==================== 蓝牙通知回调 ====================
+            function onNotification(event) {
+                const val = event.target.value;
+                if (!val) return;
+                const rawText = new TextDecoder('utf-8').decode(val);
+                addLog(`📥 收到: ${rawText}`, 'rx');
+                dataReceiveCount++;
+                updateDataCount();
 
-    async function navigateToBuilding(building) {
-      const beaconIdx = building.beaconId - 1;
-      const letter = BEACON_LETTERS[beaconIdx];
-      mapInstance.setCenter([building.lng, building.lat]);
-      mapInstance.setZoom(18);
+                // 解析数据格式: #力反馈数据#是否接触背部#
+                parseReceivedData(rawText);
 
-      if (walkingRoute) mapInstance.remove(walkingRoute);
-      walkingRoute = new AMap.Polyline({
-        path: [currentPosition, [building.lng, building.lat]],
-        strokeColor: '#27ae60',
-        strokeWeight: 4,
-        strokeStyle: 'dashed',
-        map: mapInstance,
-      });
+                // 原封不动上传到巴法云
+                uploadToBemfa(rawText);
+            }
 
-      if (connectedBeacons[beaconIdx]) {
-        await sendCommand(beaconIdx, letter, true);
-      }
-      const msg = `正在导航至${building.name}，${building.desc}，信标${beaconIdx+1}指令${letter}`;
-      speak(msg);
-      showToast(`📍 ${building.name} → 信标${beaconIdx+1} ${letter}`);
-    }
+            function parseReceivedData(rawText) {
+                // 匹配 #值1#值2# 格式
+                const match = rawText.match(/#([^#]*)#([^#]*)#?/);
+                if (match && match.length >= 3) {
+                    const forceVal = match[1].trim();
+                    const contactVal = match[2].trim();
+                    // 更新力反馈显示
+                    forceValueEl.textContent = forceVal;
+                    forceValueEl.classList.remove('updated');
+                    void forceValueEl.offsetWidth;
+                    forceValueEl.classList.add('updated');
+                    // 更新接触状态
+                    updateContactIndicator(contactVal);
+                    lastUpdateTime.textContent = '最后更新: ' + new Date().toLocaleTimeString('zh-CN', { hour12: false });
+                    addLog(`  解析 → 力反馈: ${forceVal} | 接触背部: ${contactVal}`, 'system');
+                } else {
+                    // 解析失败，尝试显示原始数据
+                    addLog(`  ⚠️ 数据格式无法解析，原始: ${rawText}`, 'error');
+                    forceValueEl.textContent = '?';
+                    updateContactIndicator(null);
+                    lastUpdateTime.textContent = '最后更新: ' + new Date().toLocaleTimeString('zh-CN', { hour12: false }) +
+                        ' (解析失败)';
+                }
+            }
 
-    searchBtn.addEventListener('click', () => {
-      const val = searchInput.value.trim();
-      if (!val) return;
-      const matched = buildings.find(b => b.name.includes(val));
-      if (matched) navigateToBuilding(matched);
-      else showToast('未找到该建筑', true);
-    });
+            function updateContactIndicator(contactVal) {
+                contactIndicator.classList.remove('contact-yes', 'contact-no', 'contact-unknown');
+                if (contactVal === '1' || contactVal === 'true' || contactVal === '是' || contactVal === 'yes') {
+                    contactIndicator.classList.add('contact-yes');
+                    contactIndicator.innerHTML = '<i class="fas fa-circle-check"></i> 已接触背部';
+                } else if (contactVal === '0' || contactVal === 'false' || contactVal === '否' || contactVal === 'no') {
+                    contactIndicator.classList.add('contact-no');
+                    contactIndicator.innerHTML = '<i class="fas fa-circle-xmark"></i> 未接触背部';
+                } else if (contactVal && contactVal.trim() !== '') {
+                    contactIndicator.classList.add('contact-yes');
+                    contactIndicator.innerHTML = `<i class="fas fa-circle-info"></i> ${contactVal}`;
+                } else {
+                    contactIndicator.classList.add('contact-unknown');
+                    contactIndicator.innerHTML = '<i class="fas fa-circle-question"></i> 未知';
+                }
+            }
 
-    // 加载地图脚本
-    function loadMap() {
-      const script = document.createElement('script');
-      script.src = `https://webapi.amap.com/maps?v=2.0&key=${AMAP_KEY}&jscode=${AMAP_SECRET}&plugin=AMap.PlaceSearch,AMap.AutoComplete,AMap.Geocoder,AMap.Geolocation,AMap.Walking`;
-      script.onload = initMap;
-      document.head.appendChild(script);
-    }
+            // ==================== 巴法云上传 ====================
+            async function uploadToBemfa(rawMsg) {
+                try {
+                    const url =
+                        `https://apis.bemfa.com/va/postmsg?uid=${encodeURIComponent(BEMFA_UID)}&topic=${encodeURIComponent(BEMFA_TOPIC)}&type=1&msg=${encodeURIComponent(rawMsg)}`;
+                    const resp = await fetch(url, { cache: 'no-store', mode: 'cors' });
+                    const json = await resp.json();
+                    if (json.code === 0) {
+                        updateCloudStatus(true);
+                        addLog(`☁️ 云端上传成功 → ${rawMsg.substring(0, 50)}${rawMsg.length > 50 ? '...' : ''}`, 'cloud-log');
+                    } else {
+                        updateCloudStatus(false);
+                        addLog(`☁️ 云端上传失败: code=${json.code} msg=${json.msg || '未知'}`, 'error');
+                    }
+                } catch (e) {
+                    updateCloudStatus(false);
+                    addLog(`☁️ 云端上传异常: ${e.message}`, 'error');
+                }
+            }
 
-    // 初始化
-    renderBeaconUI();
-    loadMap();
-  })();
-</script>
+            // ==================== 舵机角度控制 ====================
+            function updateServoDisplay(angle) {
+                currentServoAngle = angle;
+                servoSlider.value = angle;
+                servoInput.value = angle;
+                servoAngleNum.textContent = angle;
+                servoAngleDisplay.style.setProperty('--angle-deg', angle);
+            }
+
+            function sendServoAngle(angle) {
+                if (!isConnected || !writeChar) {
+                    addLog(`⚠️ 蓝牙未连接，无法下发舵机角度 ${angle}°`, 'system');
+                    return;
+                }
+                const cmd = `#${angle}#`;
+                writeChar.writeValue(new TextEncoder().encode(cmd))
+                    .then(() => {
+                        addLog(`📤 舵机下发: ${cmd}`, 'tx');
+                        updateServoDisplay(angle);
+                    })
+                    .catch(e => {
+                        addLog(`📤 下发失败: ${e.message}`, 'error');
+                    });
+            }
+
+            function debouncedSendServo(angle) {
+                const now = Date.now();
+                if (now - lastServoSendTime < SERVO_DEBOUNCE_MS) {
+                    // 清除之前的定时器，设置新的
+                    if (servoSendTimer) clearTimeout(servoSendTimer);
+                    servoSendTimer = setTimeout(() => {
+                        sendServoAngle(angle);
+                        lastServoSendTime = Date.now();
+                        servoSendTimer = null;
+                    }, SERVO_DEBOUNCE_MS);
+                } else {
+                    sendServoAngle(angle);
+                    lastServoSendTime = now;
+                }
+            }
+
+            // 滑块事件
+            servoSlider.addEventListener('input', () => {
+                const angle = parseInt(servoSlider.value);
+                updateServoDisplay(angle);
+                debouncedSendServo(angle);
+            });
+            servoSlider.addEventListener('change', () => {
+                const angle = parseInt(servoSlider.value);
+                if (servoSendTimer) {
+                    clearTimeout(servoSendTimer);
+                    servoSendTimer = null;
+                }
+                sendServoAngle(angle);
+            });
+
+            // 精确输入
+            servoSetBtn.addEventListener('click', () => {
+                let angle = parseInt(servoInput.value);
+                if (isNaN(angle)) angle = 90;
+                angle = Math.max(0, Math.min(180, angle));
+                updateServoDisplay(angle);
+                if (servoSendTimer) {
+                    clearTimeout(servoSendTimer);
+                    servoSendTimer = null;
+                }
+                sendServoAngle(angle);
+            });
+            servoInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    servoSetBtn.click();
+                }
+            });
+
+            // 预设按钮
+            document.querySelectorAll('.servo-preset').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const angle = parseInt(btn.dataset.angle);
+                    if (isNaN(angle)) return;
+                    updateServoDisplay(angle);
+                    if (servoSendTimer) {
+                        clearTimeout(servoSendTimer);
+                        servoSendTimer = null;
+                    }
+                    sendServoAngle(angle);
+                });
+            });
+
+            // ==================== 蓝牙扫描/连接/断开 ====================
+            async function scan() {
+                if (!navigator.bluetooth) {
+                    showToast('⚠️ 此浏览器不支持Web Bluetooth', 'error');
+                    addLog('❌ 浏览器不支持Web Bluetooth API', 'error');
+                    return;
+                }
+                const svc = serviceUuidInput.value.trim();
+                if (!svc) {
+                    showToast('⚠️ 请输入服务UUID', 'warn');
+                    return;
+                }
+                try {
+                    addLog('🔍 正在扫描蓝牙设备...', 'system');
+                    const device = await navigator.bluetooth.requestDevice({
+                        filters: [{ services: [svc] }],
+                        optionalServices: [svc],
+                    });
+                    bluetoothDevice = device;
+                    connectBtn.disabled = false;
+                    connectBtn2.disabled = false;
+                    addLog(`📱 已选择设备: ${device.name || device.id}`, 'system');
+                    showToast('✅ 设备已选择，请点击连接');
+                } catch (e) {
+                    if (!e.message.includes('cancelled') && !e.message.includes('取消')) {
+                        addLog(`扫描错误: ${e.message}`, 'error');
+                        showToast('扫描失败', 'error');
+                    }
+                }
+            }
+
+            async function connect() {
+                if (!bluetoothDevice) {
+                    showToast('⚠️ 请先扫描设备', 'warn');
+                    return;
+                }
+                const svc = serviceUuidInput.value.trim();
+                const ntf = notifyUuidInput.value.trim();
+                const wrt = writeUuidInput.value.trim();
+                try {
+                    addLog('🔗 正在连接蓝牙...', 'system');
+                    gattServer = await bluetoothDevice.gatt.connect();
+                    const service = await gattServer.getPrimaryService(svc);
+                    notifyChar = await service.getCharacteristic(ntf);
+                    await notifyChar.startNotifications();
+                    notifyChar.addEventListener('characteristicvaluechanged', onNotification);
+                    if (wrt) {
+                        try {
+                            writeChar = await service.getCharacteristic(wrt);
+                            addLog('✅ 写入特征已就绪', 'system');
+                        } catch (e) {
+                            addLog(`⚠️ 写入特征获取失败: ${e.message}`, 'error');
+                        }
+                    }
+                    updateConnectionUI(true);
+                    bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnect);
+                    addLog('✅ 蓝牙已成功连接', 'system');
+                    showToast('✅ 蓝牙已连接');
+                    updateCloudStatus(false);
+                } catch (e) {
+                    addLog(`连接失败: ${e.message}`, 'error');
+                    showToast('连接失败', 'error');
+                    updateConnectionUI(false);
+                }
+            }
+
+            function onDisconnect() {
+                addLog('🔌 蓝牙设备已断开', 'system');
+                if (notifyChar) {
+                    notifyChar.removeEventListener('characteristicvaluechanged', onNotification);
+                }
+                notifyChar = null;
+                writeChar = null;
+                updateConnectionUI(false);
+                updateCloudStatus(false);
+                showToast('⚠️ 蓝牙已断开', 'warn');
+            }
+
+            function disconnect() {
+                if (bluetoothDevice && bluetoothDevice.gatt && bluetoothDevice.gatt.connected) {
+                    bluetoothDevice.gatt.disconnect();
+                } else {
+                    onDisconnect();
+                }
+            }
+
+            // 绑定事件
+            scanBtn.addEventListener('click', scan);
+            scanBtn2.addEventListener('click', scan);
+            connectBtn.addEventListener('click', connect);
+            connectBtn2.addEventListener('click', connect);
+            disconnectBtn.addEventListener('click', disconnect);
+            disconnectBtn2.addEventListener('click', disconnect);
+
+            // ==================== 初始化 ====================
+            function init() {
+                updateConnectionUI(false);
+                updateCloudStatus(false);
+                updateDataCount();
+                updateServoDisplay(90);
+                // 默认显示配置面板以便用户首次配置
+                showConfigPanel();
+                addLog('🦾 抓仰头控制界面 · 江理工 已启动', 'system');
+                addLog(`☁️ 巴法云 UID: ${BEMFA_UID.substring(0, 8)}... | 主题: ${BEMFA_TOPIC}`, 'system');
+                addLog('📋 蓝牙接收格式: #力反馈数据#是否接触背部#', 'system');
+                addLog('📤 舵机下发格式: #舵机角度# (0~180°)', 'system');
+                addLog('💡 蓝牙接收的数据将原封不动上传至巴法云', 'system');
+            }
+
+            // ==================== 页面销毁前清理 ====================
+            window.addEventListener('beforeunload', () => {
+                if (servoSendTimer) clearTimeout(servoSendTimer);
+                if (bluetoothDevice && bluetoothDevice.gatt && bluetoothDevice.gatt.connected) {
+                    bluetoothDevice.gatt.disconnect();
+                }
+            });
+
+            // ==================== 页面可见性变化时更新时钟 ====================
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && isConnected) {
+                    updateConnectionUI(true);
+                }
+            });
+
+            init();
+        })();
+    </script>
 </body>
 </html>
